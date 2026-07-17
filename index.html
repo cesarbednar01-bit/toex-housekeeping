@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Housekeeping Management</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <!-- ========================= -->
+        <!-- SIDEBAR -->
+        <!-- ========================= -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+
+                <img src="logo.png" alt="Logo">
+
+                <h2>Housekeeping</h2>
+
+            </div>
+
+            <nav>
+
+                <ul>
+
+                    <li class="active">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span>Dashboard</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Nova Atividade</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Atividades</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-calendar-days"></i>
+                        <span>Calendário</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-chart-column"></i>
+                        <span>Indicadores</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-users"></i>
+                        <span>Equipe</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Cadastros</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-gear"></i>
+                        <span>Configurações</span>
+                    </li>
+
+                    <li>
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </li>
+
+                </ul>
+
+            </nav>
+
+        </aside>
+
+        <!-- ========================= -->
+        <!-- CONTEÚDO -->
+        <!-- ========================= -->
+
+        <main class="main">
+
+            <!-- HEADER -->
+
+            <header class="header">
+
+                <div class="header-left">
+
+                    <button class="menu-btn">
+
+                        <i class="fa-solid fa-bars"></i>
+
+                    </button>
+
+                    <h1>Dashboard</h1>
+
+                </div>
+
+                <div class="header-right">
+
+                    <div class="search">
+
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input type="text" placeholder="Pesquisar...">
+
+                    </div>
+
+                    <div class="notification">
+
+                        <i class="fa-solid fa-bell"></i>
+
+                        <span>3</span>
+
+                    </div>
+
+                    <div class="clock">
+
+                        <span id="clock">00:00:00</span>
+
+                    </div>
+
+                    <div class="user">
+
+                        <img src="avatar.png">
+
+                        <div>
+
+                            <strong>Administrador</strong>
+
+                            <small>Online</small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </header>
+
+            <!-- KPIs -->
+
+            <section class="cards">
+
+                <div class="card">
+                    <h3>Total de Atividades</h3>
+                    <h2>0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Concluídas</h3>
+                    <h2>0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Em Andamento</h3>
+                    <h2>0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Pendentes</h3>
+                    <h2>0</h2>
+                </div>
+
+                <div class="card">
+                    <h3>Efetividade</h3>
+                    <h2>0%</h2>
+                </div>
+
+            </section>
+
+            <!-- PRIMEIRA LINHA -->
+
+            <section class="row">
+
+                <div class="box large">
+
+                    <h3>Efetividade Operacional</h3>
+
+                </div>
+
+                <div class="box">
+
+                    <h3>Status das Atividades</h3>
+
+                </div>
+
+            </section>
+
+            <!-- SEGUNDA LINHA -->
+
+            <section class="row">
+
+                <div class="box">
+
+                    <h3>Ranking</h3>
+
+                </div>
+
+                <div class="box">
+
+                    <h3>Áreas</h3>
+
+                </div>
+
+                <div class="box">
+
+                    <h3>Criticidade</h3>
+
+                </div>
+
+            </section>
+
+            <!-- TABELA -->
+
+            <section class="table-box">
+
+                <h3>Atividades Recentes</h3>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Local</th>
+
+                            <th>Responsável</th>
+
+                            <th>Status</th>
+
+                            <th>Data</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td colspan="5">
+
+                                Nenhuma atividade cadastrada.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

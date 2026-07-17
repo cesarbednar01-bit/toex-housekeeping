@@ -1,0 +1,1586 @@
+/*==================================================
+HOUSEKEEPING MANAGEMENT SYSTEM
+DESENVOLVIDO POR CHATGPT
+==================================================*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+/*================ RESET ================*/
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+
+    font-family:'Inter',sans-serif;
+
+    background:#edf2f7;
+
+    color:#243447;
+
+    overflow:hidden;
+
+}
+
+/*================ VARIÁVEIS ================*/
+
+:root{
+
+    --azul:#0F2D52;
+
+    --azul2:#173f73;
+
+    --azul3:#1E5AA8;
+
+    --verde:#1ABC70;
+
+    --amarelo:#FFC107;
+
+    --vermelho:#E74C3C;
+
+    --cinza:#95A5A6;
+
+    --cinzaClaro:#F4F6F9;
+
+    --branco:#FFFFFF;
+
+    --borda:#E3E8EF;
+
+    --texto:#243447;
+
+    --sombra:0 8px 30px rgba(0,0,0,.08);
+
+    --radius:16px;
+
+    --transition:.30s;
+
+}
+
+/*================ CONTAINER ================*/
+
+.container{
+
+    display:flex;
+
+    width:100%;
+
+    height:100vh;
+
+}
+
+/*================ SIDEBAR ================*/
+
+.sidebar{
+
+    width:270px;
+
+    background:linear-gradient(180deg,#0F2D52,#173f73);
+
+    color:#fff;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:flex-start;
+
+    box-shadow:var(--sombra);
+
+    z-index:100;
+
+}
+
+/*================ LOGO ================*/
+
+.logo{
+
+    height:90px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:25px;
+
+    gap:15px;
+
+    border-bottom:1px solid rgba(255,255,255,.08);
+
+}
+
+.logo img{
+
+    width:48px;
+
+    height:48px;
+
+    object-fit:contain;
+
+}
+
+.logo h2{
+
+    font-size:23px;
+
+    font-weight:700;
+
+}
+
+/*================ MENU ================*/
+
+.sidebar ul{
+
+    list-style:none;
+
+    margin-top:25px;
+
+}
+
+.sidebar li{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:18px;
+
+    padding:17px 28px;
+
+    cursor:pointer;
+
+    transition:.30s;
+
+    font-size:15px;
+
+    font-weight:500;
+
+    border-left:4px solid transparent;
+
+}
+
+.sidebar li i{
+
+    width:22px;
+
+    text-align:center;
+
+    font-size:18px;
+
+}
+
+.sidebar li:hover{
+
+    background:rgba(255,255,255,.10);
+
+    border-left:4px solid #fff;
+
+}
+
+.sidebar li.active{
+
+    background:#fff;
+
+    color:#173f73;
+
+    border-left:4px solid #1ABC70;
+
+    font-weight:700;
+
+}
+
+.sidebar li.active i{
+
+    color:#1ABC70;
+
+}
+
+/*================ MAIN ================*/
+
+.main{
+
+    flex:1;
+
+    display:flex;
+
+    flex-direction:column;
+
+    overflow:auto;
+
+    background:#EDF2F7;
+
+}
+
+/*================ HEADER ================*/
+
+.header{
+
+    height:80px;
+
+    background:#fff;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:0 35px;
+
+    box-shadow:0 2px 12px rgba(0,0,0,.05);
+
+    border-bottom:1px solid #E4E8EF;
+
+}
+
+/*================ HEADER LEFT ================*/
+
+.header-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+.menu-btn{
+
+    width:45px;
+
+    height:45px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#EDF2F7;
+
+    cursor:pointer;
+
+    transition:.30s;
+
+}
+
+.menu-btn:hover{
+
+    background:#dbe5ef;
+
+}
+
+.menu-btn i{
+
+    font-size:18px;
+
+    color:#173f73;
+
+}
+
+.header h1{
+
+    font-size:28px;
+
+    color:#173f73;
+
+}
+
+/*================ HEADER RIGHT ================*/
+
+.header-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:20px;
+
+}
+
+/*==================================================
+HEADER - PESQUISA
+==================================================*/
+
+.search{
+
+    width:320px;
+    height:46px;
+
+    background:#F4F7FB;
+
+    border:1px solid #E3E8EF;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:0 18px;
+
+    transition:.3s;
+
+}
+
+.search:hover{
+
+    border-color:#1E5AA8;
+
+}
+
+.search i{
+
+    color:#7A8CA5;
+
+    margin-right:12px;
+
+}
+
+.search input{
+
+    flex:1;
+
+    border:none;
+
+    outline:none;
+
+    background:transparent;
+
+    font-size:14px;
+
+    color:#243447;
+
+}
+
+.search input::placeholder{
+
+    color:#9AA7B5;
+
+}
+
+/*==================================================
+NOTIFICAÇÃO
+==================================================*/
+
+.notification{
+
+    width:48px;
+
+    height:48px;
+
+    background:#fff;
+
+    border-radius:12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    position:relative;
+
+    cursor:pointer;
+
+    border:1px solid #E3E8EF;
+
+    transition:.3s;
+
+}
+
+.notification:hover{
+
+    background:#EDF5FF;
+
+}
+
+.notification i{
+
+    font-size:18px;
+
+    color:#173F73;
+
+}
+
+.notification span{
+
+    position:absolute;
+
+    top:-6px;
+
+    right:-4px;
+
+    width:20px;
+
+    height:20px;
+
+    background:#E74C3C;
+
+    color:#fff;
+
+    border-radius:50%;
+
+    font-size:11px;
+
+    font-weight:700;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+/*==================================================
+RELÓGIO
+==================================================*/
+
+.clock{
+
+    padding:12px 20px;
+
+    border-radius:12px;
+
+    background:#173F73;
+
+    color:#fff;
+
+    font-weight:600;
+
+    letter-spacing:1px;
+
+    font-size:14px;
+
+}
+
+/*==================================================
+USUÁRIO
+==================================================*/
+
+.user{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding-left:10px;
+
+}
+
+.user img{
+
+    width:48px;
+
+    height:48px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    border:3px solid #1ABC70;
+
+}
+
+.user strong{
+
+    display:block;
+
+    font-size:14px;
+
+    color:#243447;
+
+}
+
+.user small{
+
+    color:#1ABC70;
+
+    font-size:12px;
+
+}
+
+/*==================================================
+CARDS KPI
+==================================================*/
+
+.cards{
+
+    display:grid;
+
+    grid-template-columns:repeat(5,1fr);
+
+    gap:22px;
+
+    padding:28px;
+
+}
+
+/*==================================================
+CARD
+==================================================*/
+
+.card{
+
+    background:#FFFFFF;
+
+    border-radius:18px;
+
+    padding:24px;
+
+    box-shadow:0 8px 25px rgba(0,0,0,.06);
+
+    border:1px solid #E3E8EF;
+
+    transition:.35s;
+
+    cursor:pointer;
+
+    position:relative;
+
+    overflow:hidden;
+
+}
+
+.card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:0 15px 40px rgba(0,0,0,.12);
+
+}
+
+.card::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    width:6px;
+
+    height:100%;
+
+    background:#173F73;
+
+}
+
+/*==================================================
+CARD TÍTULO
+==================================================*/
+
+.card h3{
+
+    font-size:14px;
+
+    color:#7C8798;
+
+    font-weight:600;
+
+    margin-bottom:20px;
+
+}
+
+/*==================================================
+CARD VALOR
+==================================================*/
+
+.card h2{
+
+    font-size:34px;
+
+    color:#173F73;
+
+    font-weight:800;
+
+}
+
+/*==================================================
+CORES DOS KPIs
+==================================================*/
+
+.card:nth-child(2)::before{
+
+    background:#1ABC70;
+
+}
+
+.card:nth-child(3)::before{
+
+    background:#FFC107;
+
+}
+
+.card:nth-child(4)::before{
+
+    background:#95A5A6;
+
+}
+
+.card:nth-child(5)::before{
+
+    background:#1E88E5;
+
+}
+
+/*==================================================
+RESPONSIVIDADE DOS CARDS
+==================================================*/
+
+@media(max-width:1400px){
+
+.cards{
+
+grid-template-columns:repeat(3,1fr);
+
+}
+
+}
+
+@media(max-width:900px){
+
+.cards{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+}
+
+@media(max-width:600px){
+
+.cards{
+
+grid-template-columns:1fr;
+
+}
+
+.header{
+
+padding:15px;
+
+flex-direction:column;
+
+height:auto;
+
+gap:20px;
+
+}
+
+.header-right{
+
+flex-wrap:wrap;
+
+justify-content:center;
+
+}
+
+.search{
+
+width:100%;
+
+}
+
+}
+
+/*==================================================
+DASHBOARD
+==================================================*/
+
+.dashboard{
+
+    padding:28px;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:25px;
+
+}
+
+/*==================================================
+LINHAS
+==================================================*/
+
+.row{
+
+    display:grid;
+
+    grid-template-columns:2fr 1fr;
+
+    gap:25px;
+
+}
+
+.row:nth-child(3){
+
+    grid-template-columns:repeat(3,1fr);
+
+}
+
+/*==================================================
+BOX PADRÃO
+==================================================*/
+
+.box{
+
+    background:#FFFFFF;
+
+    border-radius:18px;
+
+    border:1px solid #E4EAF2;
+
+    box-shadow:0 8px 30px rgba(15,45,82,.06);
+
+    min-height:320px;
+
+    position:relative;
+
+    overflow:hidden;
+
+    transition:.35s;
+
+}
+
+.box:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 18px 45px rgba(15,45,82,.12);
+
+}
+
+.box.large{
+
+    min-height:320px;
+
+}
+
+/*==================================================
+CABEÇALHO DOS BOXES
+==================================================*/
+
+.box h3{
+
+    padding:22px 25px;
+
+    font-size:18px;
+
+    font-weight:700;
+
+    color:#173F73;
+
+    border-bottom:1px solid #EDF2F7;
+
+    background:#FAFBFD;
+
+}
+
+/*==================================================
+ÁREA INTERNA DOS BOXES
+==================================================*/
+
+.box::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:50%;
+
+    top:55%;
+
+    transform:translate(-50%,-50%);
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    background:rgba(23,63,115,.05);
+
+}
+
+/*==================================================
+KPI GIGANTE
+==================================================*/
+
+.box.large{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.box.large h3{
+
+    margin-bottom:10px;
+
+}
+
+.box.large::before{
+
+    content:"92%";
+
+    position:absolute;
+
+    top:50%;
+
+    left:50%;
+
+    transform:translate(-50%,-40%);
+
+    font-size:82px;
+
+    font-weight:800;
+
+    color:#1ABC70;
+
+    z-index:2;
+
+}
+
+.box.large::after{
+
+    content:"EFETIVIDADE OPERACIONAL";
+
+    position:absolute;
+
+    bottom:35px;
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    background:none;
+
+    width:auto;
+
+    height:auto;
+
+    color:#6D7A8A;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    letter-spacing:1px;
+
+}
+
+/*==================================================
+TABELA
+==================================================*/
+
+.table-box{
+
+    background:#FFFFFF;
+
+    border-radius:18px;
+
+    border:1px solid #E4EAF2;
+
+    box-shadow:0 8px 30px rgba(15,45,82,.06);
+
+    overflow:hidden;
+
+}
+
+.table-box h3{
+
+    padding:22px 25px;
+
+    color:#173F73;
+
+    border-bottom:1px solid #EDF2F7;
+
+    font-size:18px;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#F6F8FB;
+
+}
+
+thead th{
+
+    padding:18px;
+
+    text-align:left;
+
+    color:#173F73;
+
+    font-size:14px;
+
+    font-weight:700;
+
+    border-bottom:1px solid #E4EAF2;
+
+}
+
+tbody td{
+
+    padding:18px;
+
+    border-bottom:1px solid #EDF2F7;
+
+    font-size:14px;
+
+    color:#556070;
+
+}
+
+tbody tr{
+
+    transition:.3s;
+
+}
+
+tbody tr:hover{
+
+    background:#F9FBFD;
+
+}
+
+/*==================================================
+PLACEHOLDER DOS GRÁFICOS
+==================================================*/
+
+.chart-placeholder{
+
+    width:100%;
+
+    height:220px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    color:#B5C0CE;
+
+    font-size:14px;
+
+}
+
+/*==================================================
+BARRA SUPERIOR DOS GRÁFICOS
+==================================================*/
+
+.box-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 22px;
+
+    border-bottom:1px solid #EDF2F7;
+
+}
+
+.box-header h4{
+
+    color:#173F73;
+
+}
+
+.box-header button{
+
+    background:#EDF4FF;
+
+    color:#173F73;
+
+    border:none;
+
+    padding:8px 15px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+}
+
+/*==================================================
+RESPONSIVO
+==================================================*/
+
+@media(max-width:1300px){
+
+.row{
+
+grid-template-columns:1fr;
+
+}
+
+.row:nth-child(3){
+
+grid-template-columns:1fr 1fr;
+
+}
+
+}
+
+@media(max-width:900px){
+
+.row:nth-child(3){
+
+grid-template-columns:1fr;
+
+}
+
+.table-box{
+
+overflow:auto;
+
+}
+
+table{
+
+min-width:900px;
+
+}
+
+}
+
+/*==================================================
+BADGES DE STATUS
+==================================================*/
+
+.badge{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:8px 14px;
+
+    border-radius:30px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    letter-spacing:.4px;
+
+}
+
+.badge.success{
+
+    background:#D9F7E8;
+
+    color:#17A85B;
+
+}
+
+.badge.warning{
+
+    background:#FFF3D2;
+
+    color:#D48806;
+
+}
+
+.badge.danger{
+
+    background:#FFE3E3;
+
+    color:#D7263D;
+
+}
+
+.badge.gray{
+
+    background:#ECEFF3;
+
+    color:#6B7280;
+
+}
+
+/*==================================================
+BARRAS DE PROGRESSO
+==================================================*/
+
+.progress{
+
+    width:100%;
+
+    height:8px;
+
+    background:#EEF2F7;
+
+    border-radius:50px;
+
+    overflow:hidden;
+
+    margin-top:15px;
+
+}
+
+.progress span{
+
+    display:block;
+
+    height:100%;
+
+    border-radius:50px;
+
+    background:linear-gradient(90deg,#1ABC70,#28D17C);
+
+    animation:progressAnimation 2s ease;
+
+}
+
+.progress.warning span{
+
+    background:linear-gradient(90deg,#FFC107,#FFD95A);
+
+}
+
+.progress.danger span{
+
+    background:linear-gradient(90deg,#E74C3C,#FF6B6B);
+
+}
+
+@keyframes progressAnimation{
+
+    from{
+
+        width:0;
+
+    }
+
+}
+
+/*==================================================
+SCROLL PADRÃO
+==================================================*/
+
+::-webkit-scrollbar{
+
+    width:10px;
+
+    height:10px;
+
+}
+
+::-webkit-scrollbar-track{
+
+    background:#EEF2F7;
+
+}
+
+::-webkit-scrollbar-thumb{
+
+    background:#C7D2DF;
+
+    border-radius:50px;
+
+}
+
+::-webkit-scrollbar-thumb:hover{
+
+    background:#9FB0C4;
+
+}
+
+/*==================================================
+EFEITO GLASS
+==================================================*/
+
+.glass{
+
+    backdrop-filter:blur(14px);
+
+    background:rgba(255,255,255,.65);
+
+    border:1px solid rgba(255,255,255,.5);
+
+}
+
+/*==================================================
+ANIMAÇÕES
+==================================================*/
+
+.fadeIn{
+
+    animation:fadeIn .7s ease;
+
+}
+
+.slideUp{
+
+    animation:slideUp .6s ease;
+
+}
+
+.scale{
+
+    animation:scale .45s ease;
+
+}
+
+@keyframes fadeIn{
+
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+@keyframes slideUp{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(30px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0);
+
+    }
+
+}
+
+@keyframes scale{
+
+    from{
+
+        transform:scale(.92);
+
+        opacity:0;
+
+    }
+
+    to{
+
+        transform:scale(1);
+
+        opacity:1;
+
+    }
+
+}
+
+/*==================================================
+EFEITO HOVER GERAL
+==================================================*/
+
+.card,
+.box,
+.table-box{
+
+    transition:.35s;
+
+}
+
+.card:hover,
+.box:hover,
+.table-box:hover{
+
+    box-shadow:0 20px 45px rgba(15,45,82,.12);
+
+}
+
+/*==================================================
+BOTÕES
+==================================================*/
+
+.btn{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    padding:12px 20px;
+
+    border-radius:12px;
+
+    border:none;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.30s;
+
+}
+
+.btn-primary{
+
+    background:#173F73;
+
+    color:#FFF;
+
+}
+
+.btn-primary:hover{
+
+    background:#0F2D52;
+
+}
+
+.btn-success{
+
+    background:#1ABC70;
+
+    color:#FFF;
+
+}
+
+.btn-success:hover{
+
+    background:#17A85B;
+
+}
+
+.btn-danger{
+
+    background:#E74C3C;
+
+    color:#FFF;
+
+}
+
+.btn-danger:hover{
+
+    background:#D63031;
+
+}
+
+/*==================================================
+LOADER
+==================================================*/
+
+.loader{
+
+    width:45px;
+
+    height:45px;
+
+    border:5px solid #EDF2F7;
+
+    border-top:5px solid #173F73;
+
+    border-radius:50%;
+
+    animation:spin .8s linear infinite;
+
+}
+
+@keyframes spin{
+
+    to{
+
+        transform:rotate(360deg);
+
+    }
+
+}
+
+/*==================================================
+MODO TV
+==================================================*/
+
+@media(min-width:1800px){
+
+body{
+
+font-size:18px;
+
+}
+
+.sidebar{
+
+width:320px;
+
+}
+
+.header{
+
+height:95px;
+
+}
+
+.header h1{
+
+font-size:34px;
+
+}
+
+.cards{
+
+gap:30px;
+
+}
+
+.card{
+
+padding:35px;
+
+}
+
+.card h2{
+
+font-size:48px;
+
+}
+
+.box{
+
+min-height:420px;
+
+}
+
+.table-box{
+
+font-size:18px;
+
+}
+
+}
+
+/*==================================================
+MOBILE
+==================================================*/
+
+@media(max-width:768px){
+
+.sidebar{
+
+position:fixed;
+
+left:-270px;
+
+top:0;
+
+height:100vh;
+
+transition:.35s;
+
+}
+
+.sidebar.active{
+
+left:0;
+
+}
+
+.main{
+
+width:100%;
+
+}
+
+.header{
+
+padding:15px;
+
+}
+
+.header-right{
+
+gap:10px;
+
+}
+
+.search{
+
+display:none;
+
+}
+
+.clock{
+
+display:none;
+
+}
+
+.cards{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+/*==================================================
+FOOTER (PREPARAÇÃO)
+==================================================*/
+
+.footer{
+
+height:60px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:13px;
+
+color:#6B7280;
+
+margin-top:25px;
+
+}
+
+/*==================================================
+FINAL
+==================================================*/
+
+html,
+body{
+
+width:100%;
+
+height:100%;
+
+}
