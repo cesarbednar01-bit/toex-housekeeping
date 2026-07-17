@@ -4,286 +4,529 @@
 <head>
 
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Housekeeping Management</title>
+    <title>Housekeeping - Terminal TOEX</title>
 
-    <!-- Google Fonts -->
+    <link rel="stylesheet" href="style.css">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <!-- Font Awesome -->
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-    <!-- CSS -->
-    <link rel="stylesheet" href="style.css">
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
 <body>
 
-    <div class="container">
+<div class="dashboard">
 
-        <!-- ========================= -->
-        <!-- SIDEBAR -->
-        <!-- ========================= -->
+    <!--====================================-->
+    <!-- HEADER -->
+    <!--====================================-->
 
-        <aside class="sidebar">
+    <header class="topo">
 
-            <div class="logo">
+        <div class="empresa">
 
-                <img src="logo.png" alt="Logo">
+            <img src="logo.png">
 
-                <h2>Housekeeping</h2>
+        </div>
+
+        <div class="titulo">
+
+            <h1>
+
+                HOUSEKEEPING - TERMINAL TOEX
+
+            </h1>
+
+            <span>
+
+                ACOMPANHAMENTO DE ATIVIDADES
+
+            </span>
+
+        </div>
+
+        <div class="informacoes">
+
+            <div class="info">
+
+                <i class="fa-regular fa-calendar-days"></i>
+
+                <div>
+
+                    <small>ATUALIZAÇÃO:</small>
+
+                    <strong id="dataHora">
+
+                        16/07/2026 08:30
+
+                    </strong>
+
+                </div>
 
             </div>
 
-            <nav>
+            <div class="periodo">
 
-                <ul>
+                <small>PERÍODO</small>
 
-                    <li class="active">
-                        <i class="fa-solid fa-chart-line"></i>
-                        <span>Dashboard</span>
-                    </li>
+                <input type="text" value="10/07/2026 á 16/07/2026">
 
-                    <li>
-                        <i class="fa-solid fa-plus"></i>
-                        <span>Nova Atividade</span>
-                    </li>
+            </div>
 
-                    <li>
-                        <i class="fa-solid fa-list-check"></i>
-                        <span>Atividades</span>
-                    </li>
+        </div>
 
-                    <li>
-                        <i class="fa-solid fa-calendar-days"></i>
-                        <span>Calendário</span>
-                    </li>
+    </header>
 
-                    <li>
-                        <i class="fa-solid fa-chart-column"></i>
-                        <span>Indicadores</span>
-                    </li>
+        <!--====================================-->
+    <!-- CARDS KPI -->
+    <!--====================================-->
 
-                    <li>
-                        <i class="fa-solid fa-users"></i>
-                        <span>Equipe</span>
-                    </li>
+    <section class="cards">
 
-                    <li>
-                        <i class="fa-solid fa-layer-group"></i>
-                        <span>Cadastros</span>
-                    </li>
+        <!-- TOTAL -->
 
-                    <li>
-                        <i class="fa-solid fa-gear"></i>
-                        <span>Configurações</span>
-                    </li>
+        <div class="card azul">
 
-                    <li>
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        <span>Logout</span>
-                    </li>
+            <div class="icone">
 
-                </ul>
+                <i class="fa-regular fa-clipboard"></i>
 
-            </nav>
+            </div>
 
-        </aside>
+            <div class="conteudo">
 
-        <!-- ========================= -->
-        <!-- CONTEÚDO -->
-        <!-- ========================= -->
+                <small>TOTAL ATIVIDADES</small>
 
-        <main class="main">
+                <h2>28</h2>
 
-            <!-- HEADER -->
+            </div>
 
-            <header class="header">
+        </div>
 
-                <div class="header-left">
+        <!-- CONCLUÍDAS -->
 
-                    <button class="menu-btn">
+        <div class="card verde">
 
-                        <i class="fa-solid fa-bars"></i>
+            <div class="icone">
 
-                    </button>
+                <i class="fa-regular fa-circle-check"></i>
 
-                    <h1>Dashboard</h1>
+            </div>
 
-                </div>
+            <div class="conteudo">
 
-                <div class="header-right">
+                <small>CONCLUÍDAS</small>
 
-                    <div class="search">
+                <h2>14</h2>
 
-                        <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
 
-                        <input type="text" placeholder="Pesquisar...">
+        </div>
 
-                    </div>
+        <!-- EM ANDAMENTO -->
 
-                    <div class="notification">
+        <div class="card amarelo">
 
-                        <i class="fa-solid fa-bell"></i>
+            <div class="icone">
 
-                        <span>3</span>
+                <i class="fa-solid fa-gear"></i>
 
-                    </div>
+            </div>
 
-                    <div class="clock">
+            <div class="conteudo">
 
-                        <span id="clock">00:00:00</span>
+                <small>EM ANDAMENTO</small>
 
-                    </div>
+                <h2>8</h2>
 
-                    <div class="user">
+            </div>
 
-                        <img src="avatar.png">
+        </div>
 
-                        <div>
+        <!-- PENDENTES -->
 
-                            <strong>Administrador</strong>
+        <div class="card cinza">
 
-                            <small>Online</small>
+            <div class="icone">
 
-                        </div>
+                <i class="fa-regular fa-file-lines"></i>
 
-                    </div>
+            </div>
 
-                </div>
+            <div class="conteudo">
 
-            </header>
+                <small>PENDENTES</small>
 
-            <!-- KPIs -->
+                <h2>2</h2>
 
-            <section class="cards">
+            </div>
 
-                <div class="card">
-                    <h3>Total de Atividades</h3>
-                    <h2>0</h2>
-                </div>
+        </div>
 
-                <div class="card">
-                    <h3>Concluídas</h3>
-                    <h2>0</h2>
-                </div>
+        <!-- ATRASADAS -->
 
-                <div class="card">
-                    <h3>Em Andamento</h3>
-                    <h2>0</h2>
-                </div>
+        <div class="card vermelho">
 
-                <div class="card">
-                    <h3>Pendentes</h3>
-                    <h2>0</h2>
-                </div>
+            <div class="icone">
 
-                <div class="card">
-                    <h3>Efetividade</h3>
-                    <h2>0%</h2>
-                </div>
+                <i class="fa-solid fa-triangle-exclamation"></i>
 
-            </section>
+            </div>
 
-            <!-- PRIMEIRA LINHA -->
+            <div class="conteudo">
 
-            <section class="row">
+                <small>ATRASADAS</small>
 
-                <div class="box large">
+                <h2>4</h2>
 
-                    <h3>Efetividade Operacional</h3>
+            </div>
+
+        </div>
+
+        <!-- EFETIVIDADE -->
+
+        <div class="card branco">
+
+            <div class="conteudo-centro">
+
+                <small>% CONCLUSÃO</small>
+
+                <div class="grafico-circle">
+
+                    <span>50%</span>
 
                 </div>
 
-                <div class="box">
+            </div>
 
-                    <h3>Status das Atividades</h3>
+        </div>
+
+    </section>
+
+        <!--====================================-->
+    <!-- GRÁFICOS -->
+    <!--====================================-->
+
+    <section class="graficos">
+
+        <!-- STATUS -->
+
+        <div class="painel">
+
+            <div class="painel-header">
+
+                <i class="fa-solid fa-chart-pie"></i>
+
+                <h3>Status das Atividades</h3>
+
+            </div>
+
+            <div class="painel-body">
+
+                <canvas id="graficoStatus"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- RESPONSÁVEL -->
+
+        <div class="painel">
+
+            <div class="painel-header">
+
+                <i class="fa-solid fa-users"></i>
+
+                <h3>Atividades por Responsável</h3>
+
+            </div>
+
+            <div class="painel-body">
+
+                <canvas id="graficoResponsavel"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- ÁREA -->
+
+        <div class="painel">
+
+            <div class="painel-header">
+
+                <i class="fa-solid fa-industry"></i>
+
+                <h3>Atividades por Área</h3>
+
+            </div>
+
+            <div class="painel-body">
+
+                <canvas id="graficoArea"></canvas>
+
+            </div>
+
+        </div>
+
+        <!-- CRITICIDADE -->
+
+        <div class="painel">
+
+            <div class="painel-header">
+
+                <i class="fa-solid fa-triangle-exclamation"></i>
+
+                <h3>Criticidade</h3>
+
+            </div>
+
+            <div class="painel-body">
+
+                <canvas id="graficoCriticidade"></canvas>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!--====================================-->
+    <!-- EFETIVIDADE OPERACIONAL -->
+    <!--====================================-->
+
+    <section class="efetividade">
+
+        <div class="efetividade-card">
+
+            <div class="efetividade-info">
+
+                <span>EFETIVIDADE OPERACIONAL</span>
+
+                <h2>92%</h2>
+
+                <p>Meta do dia: <strong>90%</strong></p>
+
+            </div>
+
+            <div class="barra-efetividade">
+
+                <div class="barra">
+
+                    <div class="progresso" style="width:92%;"></div>
 
                 </div>
 
-            </section>
+            </div>
 
-            <!-- SEGUNDA LINHA -->
+        </div>
 
-            <section class="row">
+    </section>
 
-                <div class="box">
+        <!--====================================-->
+    <!-- TABELA DE ATIVIDADES -->
+    <!--====================================-->
 
-                    <h3>Ranking</h3>
+    <section class="tabela-container">
 
-                </div>
+        <div class="tabela-header">
 
-                <div class="box">
+            <div>
 
-                    <h3>Áreas</h3>
+                <h2>LISTA OPERACIONAL DE ATIVIDADES</h2>
 
-                </div>
+                <span>Acompanhamento em tempo real</span>
 
-                <div class="box">
+            </div>
 
-                    <h3>Criticidade</h3>
+            <div class="acoes">
 
-                </div>
+                <button class="btn-exportar">
+                    <i class="fa-solid fa-file-excel"></i>
+                    Exportar
+                </button>
 
-            </section>
+                <button class="btn-imprimir">
+                    <i class="fa-solid fa-print"></i>
+                    Imprimir
+                </button>
 
-            <!-- TABELA -->
+                <button class="btn-nova">
+                    <i class="fa-solid fa-plus"></i>
+                    Nova Atividade
+                </button>
 
-            <section class="table-box">
+            </div>
 
-                <h3>Atividades Recentes</h3>
+        </div>
 
-                <table>
+        <div class="tabela-scroll">
 
-                    <thead>
+            <table>
 
-                        <tr>
+                <thead>
 
-                            <th>ID</th>
+                    <tr>
 
-                            <th>Local</th>
+                        <th>ID</th>
+                        <th>Local</th>
+                        <th>Área</th>
+                        <th>Atividade</th>
+                        <th>Responsável</th>
+                        <th>Equipe</th>
+                        <th>Prioridade</th>
+                        <th>Status</th>
+                        <th>Início</th>
+                        <th>Prazo</th>
+                        <th>%</th>
+                        <th>Ações</th>
 
-                            <th>Responsável</th>
+                    </tr>
 
-                            <th>Status</th>
+                </thead>
 
-                            <th>Data</th>
+                <tbody>
 
-                        </tr>
+                    <tr>
 
-                    </thead>
+                        <td>001</td>
+                        <td>Armazém 01</td>
+                        <td>Recebimento</td>
+                        <td>Limpeza Geral</td>
+                        <td>Carlos Silva</td>
+                        <td>Equipe A</td>
 
-                    <tbody>
+                        <td>
+                            <span class="prioridade alta">
+                                Alta
+                            </span>
+                        </td>
 
-                        <tr>
+                        <td>
+                            <span class="status andamento">
+                                Em andamento
+                            </span>
+                        </td>
 
-                            <td colspan="5">
+                        <td>07:30</td>
 
-                                Nenhuma atividade cadastrada.
+                        <td>11:00</td>
 
-                            </td>
+                        <td>
 
-                        </tr>
+                            <div class="mini-barra">
 
-                    </tbody>
+                                <div class="mini-progresso" style="width:60%;"></div>
 
-                </table>
+                            </div>
 
-            </section>
+                            60%
 
-        </main>
+                        </td>
 
-    </div>
+                        <td>
 
-    <script src="script.js"></script>
+                            <button class="acao visualizar">
+
+                                <i class="fa-solid fa-eye"></i>
+
+                            </button>
+
+                            <button class="acao editar">
+
+                                <i class="fa-solid fa-pen"></i>
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>002</td>
+                        <td>Pátio</td>
+                        <td>Expedição</td>
+                        <td>Organização de Materiais</td>
+                        <td>Marcos Lima</td>
+                        <td>Equipe B</td>
+
+                        <td>
+
+                            <span class="prioridade media">
+
+                                Média
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <span class="status concluido">
+
+                                Concluído
+
+                            </span>
+
+                        </td>
+
+                        <td>08:00</td>
+
+                        <td>10:30</td>
+
+                        <td>
+
+                            <div class="mini-barra">
+
+                                <div class="mini-progresso" style="width:100%;"></div>
+
+                            </div>
+
+                            100%
+
+                        </td>
+
+                        <td>
+
+                            <button class="acao visualizar">
+
+                                <i class="fa-solid fa-eye"></i>
+
+                            </button>
+
+                            <button class="acao editar">
+
+                                <i class="fa-solid fa-pen"></i>
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="script.js"></script>
 
 </body>
 
