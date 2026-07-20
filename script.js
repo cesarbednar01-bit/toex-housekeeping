@@ -14,11 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
 INICIALIZAÇÃO
 ==================================================*/
 
-function iniciarSistema(){
+function iniciarSistema() {
 
     atualizarDataHora();
 
-    setInterval(atualizarDataHora,1000);
+    setInterval(atualizarDataHora, 1000);
 
     animarCards();
 
@@ -30,25 +30,25 @@ function iniciarSistema(){
 DATA E HORA
 ==================================================*/
 
-function atualizarDataHora(){
+function atualizarDataHora() {
 
     const elemento = document.getElementById("dataHora");
 
-    if(!elemento) return;
+    if (!elemento) return;
 
     const agora = new Date();
 
-    const dia = String(agora.getDate()).padStart(2,"0");
+    const dia = String(agora.getDate()).padStart(2, "0");
 
-    const mes = String(agora.getMonth()+1).padStart(2,"0");
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
 
     const ano = agora.getFullYear();
 
-    const hora = String(agora.getHours()).padStart(2,"0");
+    const hora = String(agora.getHours()).padStart(2, "0");
 
-    const minuto = String(agora.getMinutes()).padStart(2,"0");
+    const minuto = String(agora.getMinutes()).padStart(2, "0");
 
-    const segundo = String(agora.getSeconds()).padStart(2,"0");
+    const segundo = String(agora.getSeconds()).padStart(2, "0");
 
     elemento.innerHTML =
         `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
@@ -59,25 +59,25 @@ function atualizarDataHora(){
 ANIMAÇÃO DOS CARDS
 ==================================================*/
 
-function animarCards(){
+function animarCards() {
 
-    const cards=document.querySelectorAll(".card");
+    const cards = document.querySelectorAll(".card");
 
-    cards.forEach((card,index)=>{
+    cards.forEach((card, index) => {
 
-        card.style.opacity="0";
+        card.style.opacity = "0";
 
-        card.style.transform="translateY(25px)";
+        card.style.transform = "translateY(25px)";
 
-        setTimeout(()=>{
+        setTimeout(() => {
 
-            card.style.transition=".5s";
+            card.style.transition = ".5s";
 
-            card.style.opacity="1";
+            card.style.opacity = "1";
 
-            card.style.transform="translateY(0px)";
+            card.style.transform = "translateY(0px)";
 
-        },index*120);
+        }, index * 120);
 
     });
 
@@ -87,37 +87,36 @@ function animarCards(){
 BOTÕES
 ==================================================*/
 
-function configurarBotoes(){
+function configurarBotoes() {
 
-    const btnNova=document.querySelector(".btn-nova");
+    const btnNova = document.querySelector(".btn-nova");
 
-    const btnExcel=document.querySelector(".btn-exportar");
+    const btnPDF = document.querySelector(".btn-exportar");
 
-    const btnPrint=document.querySelector(".btn-imprimir");
+    const btnPrint = document.querySelector(".btn-imprimir");
 
-    if(btnNova){
+   if (btnNova) {
 
-        btnNova.addEventListener("click",()=>{
+    btnNova.addEventListener("click", () => {
 
-            alert("Tela de cadastro será criada na próxima etapa.");
+        modal.classList.add("active");
 
-        });
+    });
 
-    }
+}
 
-    if(btnExcel){
+    if (btnPDF) {
 
-        btnExcel.addEventListener("click",()=>{
+        btnPDF.addEventListener("click", exportarPDF);
 
-            alert("Exportação para Excel será implementada.");
 
-        });
+    };
 
-    }
 
-    if(btnPrint){
 
-        btnPrint.addEventListener("click",()=>{
+    if (btnPrint) {
+
+        btnPrint.addEventListener("click", () => {
 
             window.print();
 
@@ -131,19 +130,19 @@ function configurarBotoes(){
 ATUALIZAÇÃO DOS KPIs
 ==================================================*/
 
-function atualizarKPIs(){
+function atualizarKPIs() {
 
-    document.querySelector(".azul h2").innerHTML="28";
+    document.querySelector(".azul h2").innerHTML = "28";
 
-    document.querySelector(".verde h2").innerHTML="14";
+    document.querySelector(".verde h2").innerHTML = "14";
 
-    document.querySelector(".amarelo h2").innerHTML="8";
+    document.querySelector(".amarelo h2").innerHTML = "8";
 
-    document.querySelector(".cinza h2").innerHTML="2";
+    document.querySelector(".cinza h2").innerHTML = "2";
 
-    document.querySelector(".vermelho h2").innerHTML="4";
+    document.querySelector(".vermelho h2").innerHTML = "4";
 
-    document.querySelector(".grafico-circle span").innerHTML="50%";
+    document.querySelector(".grafico-circle span").innerHTML = "50%";
 
 }
 
@@ -153,30 +152,30 @@ atualizarKPIs();
 UTILITÁRIOS
 ==================================================*/
 
-function formatarNumero(numero){
+function formatarNumero(numero) {
 
     return numero.toLocaleString("pt-BR");
 
 }
 
-function gerarID(){
+function gerarID() {
 
     return Date.now();
 
 }
 
 console.log("%cHOUSEKEEPING TOEX",
-"color:#0D2F5C;font-size:22px;font-weight:bold");
+    "color:#0D2F5C;font-size:22px;font-weight:bold");
 
 console.log("%cSistema iniciado com sucesso.",
-"color:#2CBF6E;font-size:14px");
+    "color:#2CBF6E;font-size:14px");
 
 /*==================================================
 CHART.JS
 ==================================================*/
 
 let graficoStatus;
-let graficoResponsavel;
+let graficoColaborador;
 let graficoArea;
 let graficoCriticidade;
 
@@ -194,11 +193,11 @@ document.addEventListener("DOMContentLoaded", () => {
 STATUS
 ==================================================*/
 
-function criarGraficos(){
+function criarGraficos() {
 
     criarGraficoStatus();
 
-    criarGraficoResponsavel();
+    criarGraficoColaborador();
 
     criarGraficoArea();
 
@@ -210,19 +209,19 @@ function criarGraficos(){
 GRÁFICO STATUS
 ==================================================*/
 
-function criarGraficoStatus(){
+function criarGraficoStatus() {
 
-    const canvas=document.getElementById("graficoStatus");
+    const canvas = document.getElementById("graficoStatus");
 
-    if(!canvas) return;
+    if (!canvas) return;
 
-    graficoStatus=new Chart(canvas,{
+    graficoStatus = new Chart(canvas, {
 
-        type:"doughnut",
+        type: "doughnut",
 
-        data:{
+        data: {
 
-            labels:[
+            labels: [
 
                 "Concluídas",
 
@@ -234,11 +233,11 @@ function criarGraficoStatus(){
 
             ],
 
-            datasets:[{
+            datasets: [{
 
-                data:[14,8,2,4],
+                data: [14, 8, 2, 4],
 
-                backgroundColor:[
+                backgroundColor: [
 
                     "#2CBF6E",
 
@@ -250,23 +249,23 @@ function criarGraficoStatus(){
 
                 ],
 
-                borderWidth:0
+                borderWidth: 0
 
             }]
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false,
+            maintainAspectRatio: false,
 
-            plugins:{
+            plugins: {
 
-                legend:{
+                legend: {
 
-                    position:"bottom"
+                    position: "bottom"
 
                 }
 
@@ -279,22 +278,22 @@ function criarGraficoStatus(){
 }
 
 /*==================================================
-RESPONSÁVEIS
+GRÁFICO COLABORADOR
 ==================================================*/
 
-function criarGraficoResponsavel(){
+function criarGraficoColaborador() {
 
-    const canvas=document.getElementById("graficoResponsavel");
+    const canvas = document.getElementById("graficoColaborador");
 
-    if(!canvas) return;
+    if (!canvas) return;
 
-    graficoResponsavel=new Chart(canvas,{
+    graficoColaborador = new Chart(canvas, {
 
-        type:"bar",
+        type: "bar",
 
-        data:{
+        data: {
 
-            labels:[
+            labels: [
 
                 "Carlos",
 
@@ -308,41 +307,41 @@ function criarGraficoResponsavel(){
 
             ],
 
-            datasets:[{
+            datasets: [{
 
-                label:"Atividades",
+                label: "Atividades",
 
-                data:[8,6,5,4,5],
+                data: [8, 6, 5, 4, 5],
 
-                backgroundColor:"#184E8C",
+                backgroundColor: "#184E8C",
 
-                borderRadius:8
+                borderRadius: 8
 
             }]
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false,
+            maintainAspectRatio: false,
 
-            plugins:{
+            plugins: {
 
-                legend:{
+                legend: {
 
-                    display:false
+                    display: false
 
                 }
 
             },
 
-            scales:{
+            scales: {
 
-                y:{
+                y: {
 
-                    beginAtZero:true
+                    beginAtZero: true
 
                 }
 
@@ -358,19 +357,19 @@ function criarGraficoResponsavel(){
 ÁREAS
 ==================================================*/
 
-function criarGraficoArea(){
+function criarGraficoArea() {
 
-    const canvas=document.getElementById("graficoArea");
+    const canvas = document.getElementById("graficoArea");
 
-    if(!canvas) return;
+    if (!canvas) return;
 
-    graficoArea=new Chart(canvas,{
+    graficoArea = new Chart(canvas, {
 
-        type:"pie",
+        type: "pie",
 
-        data:{
+        data: {
 
-            labels:[
+            labels: [
 
                 "Armazém",
 
@@ -382,11 +381,11 @@ function criarGraficoArea(){
 
             ],
 
-            datasets:[{
+            datasets: [{
 
-                data:[10,7,6,5],
+                data: [10, 7, 6, 5],
 
-                backgroundColor:[
+                backgroundColor: [
 
                     "#0D2F5C",
 
@@ -398,17 +397,17 @@ function criarGraficoArea(){
 
                 ],
 
-                borderWidth:0
+                borderWidth: 0
 
             }]
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false
+            maintainAspectRatio: false
 
         }
 
@@ -420,19 +419,19 @@ function criarGraficoArea(){
 CRITICIDADE
 ==================================================*/
 
-function criarGraficoCriticidade(){
+function criarGraficoCriticidade() {
 
-    const canvas=document.getElementById("graficoCriticidade");
+    const canvas = document.getElementById("graficoCriticidade");
 
-    if(!canvas) return;
+    if (!canvas) return;
 
-    graficoCriticidade=new Chart(canvas,{
+    graficoCriticidade = new Chart(canvas, {
 
-        type:"polarArea",
+        type: "polarArea",
 
-        data:{
+        data: {
 
-            labels:[
+            labels: [
 
                 "Alta",
 
@@ -442,11 +441,11 @@ function criarGraficoCriticidade(){
 
             ],
 
-            datasets:[{
+            datasets: [{
 
-                data:[5,9,14],
+                data: [5, 9, 14],
 
-                backgroundColor:[
+                backgroundColor: [
 
                     "#E74C3C",
 
@@ -460,17 +459,17 @@ function criarGraficoCriticidade(){
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false,
+            maintainAspectRatio: false,
 
-            plugins:{
+            plugins: {
 
-                legend:{
+                legend: {
 
-                    position:"bottom"
+                    position: "bottom"
 
                 }
 
@@ -486,11 +485,11 @@ function criarGraficoCriticidade(){
 ATUALIZAR TODOS OS GRÁFICOS
 ==================================================*/
 
-function atualizarGraficos(dados){
+function atualizarGraficos(dados) {
 
-    if(graficoStatus){
+    if (graficoStatus) {
 
-        graficoStatus.data.datasets[0].data=[
+        graficoStatus.data.datasets[0].data = [
             dados.concluidas,
             dados.andamento,
             dados.pendentes,
@@ -509,33 +508,33 @@ BANCO DE DADOS TEMPORÁRIO
 
 let atividades = [
 
-{
-    id:1,
-    local:"Armazém 01",
-    area:"Recebimento",
-    atividade:"Limpeza Geral",
-    responsavel:"Carlos Silva",
-    equipe:"Equipe A",
-    prioridade:"Alta",
-    status:"Em andamento",
-    inicio:"07:30",
-    prazo:"11:00",
-    progresso:60
-},
+    {
+        id: 1,
+        local: "Armazém 01",
+        area: "Recebimento",
+        atividade: "Limpeza Geral",
+        encarregado: "Rayan Cardoso",
+        colaborador: "Carlos Silva",
+        prioridade: "Alta",
+        status: "Em andamento",
+        inicio: "07:30",
+        prazo: "11:00",
+        progresso: 60
+    },
 
-{
-    id:2,
-    local:"Pátio",
-    area:"Expedição",
-    atividade:"Organização",
-    responsavel:"Marcos Lima",
-    equipe:"Equipe B",
-    prioridade:"Média",
-    status:"Concluído",
-    inicio:"08:00",
-    prazo:"10:30",
-    progresso:100
-}
+    {
+        id: 2,
+        local: "Pátio",
+        area: "Expedição",
+        atividade: "Organização",
+        encarregado: "Rayan Cardoso",
+        colaborador: "Marcos Andrade",
+        prioridade: "Média",
+        status: "Concluído",
+        inicio: "08:00",
+        prazo: "10:30",
+        progresso: 100
+    }
 
 ];
 
@@ -543,7 +542,7 @@ let atividades = [
 INICIALIZA TABELA
 ==================================================*/
 
-document.addEventListener("DOMContentLoaded",()=>{
+document.addEventListener("DOMContentLoaded", () => {
 
     carregarTabela();
 
@@ -553,17 +552,17 @@ document.addEventListener("DOMContentLoaded",()=>{
 CARREGAR TABELA
 ==================================================*/
 
-function carregarTabela(){
+function carregarTabela() {
 
-    const tbody=document.querySelector("tbody");
+    const tbody = document.querySelector("tbody");
 
-    if(!tbody) return;
+    if (!tbody) return;
 
-    tbody.innerHTML="";
+    tbody.innerHTML = "";
 
-    atividades.forEach(item=>{
+    atividades.forEach(item => {
 
-        tbody.innerHTML+=`
+        tbody.innerHTML += `
 
         <tr>
 
@@ -575,9 +574,9 @@ function carregarTabela(){
 
             <td>${item.atividade}</td>
 
-            <td>${item.responsavel}</td>
+            <td>${item.encarregado}</td>
 
-            <td>${item.equipe}</td>
+            <td>${item.colaborador}</td>
 
             <td>
 
@@ -651,9 +650,9 @@ function carregarTabela(){
 STATUS
 ==================================================*/
 
-function converterStatus(status){
+function converterStatus(status) {
 
-    switch(status){
+    switch (status) {
 
         case "Concluído":
             return "concluido";
@@ -678,21 +677,23 @@ function converterStatus(status){
 VISUALIZAR
 ==================================================*/
 
-function visualizar(id){
+function visualizar(id) {
 
-    const atividade=atividades.find(a=>a.id===id);
+    const atividade = atividades.find(a => a.id === id);
 
-    if(!atividade) return;
+    if (!atividade) return;
 
     alert(
 
-`ATIVIDADE
+        `ATIVIDADE
 
 Local: ${atividade.local}
 
 Área: ${atividade.area}
 
-Responsável: ${atividade.responsavel}
+Encarregado: ${atividade.encarregado}
+
+Colaborador: ${atividade.colaborador}
 
 Status: ${atividade.status}
 
@@ -706,7 +707,7 @@ Progresso: ${atividade.progresso}%`
 EDITAR
 ==================================================*/
 
-function editar(id){
+function editar(id) {
 
     alert("Tela de edição será criada na próxima etapa.");
 
@@ -716,7 +717,7 @@ function editar(id){
 ADICIONAR NOVA ATIVIDADE
 ==================================================*/
 
-function adicionarAtividade(objeto){
+function adicionarAtividade(objeto) {
 
     atividades.push(objeto);
 
@@ -730,9 +731,9 @@ function adicionarAtividade(objeto){
 EXCLUIR
 ==================================================*/
 
-function excluirAtividade(id){
+function excluirAtividade(id) {
 
-    atividades=atividades.filter(item=>item.id!==id);
+    atividades = atividades.filter(item => item.id !== id);
 
     carregarTabela();
 
@@ -744,7 +745,7 @@ function excluirAtividade(id){
 KPIs AUTOMÁTICOS
 ==================================================*/
 
-function atualizarKPIsAutomatico(){
+function atualizarKPIsAutomatico() {
 
     const total = atividades.length;
 
@@ -772,7 +773,7 @@ function atualizarKPIsAutomatico(){
 
     const circle = document.querySelector(".grafico-circle span");
 
-    if(circle){
+    if (circle) {
 
         circle.innerHTML = percentual + "%";
 
@@ -793,11 +794,11 @@ function atualizarKPIsAutomatico(){
 ANIMAÇÃO DOS KPIs
 ==================================================*/
 
-function atualizarCard(seletor, valor){
+function atualizarCard(seletor, valor) {
 
     const elemento = document.querySelector(seletor);
 
-    if(!elemento) return;
+    if (!elemento) return;
 
     animarNumero(elemento, valor);
 
@@ -807,19 +808,19 @@ function atualizarCard(seletor, valor){
 ANIMAÇÃO DOS NÚMEROS
 ==================================================*/
 
-function animarNumero(elemento, destino){
+function animarNumero(elemento, destino) {
 
     let numero = 0;
 
     clearInterval(elemento.timer);
 
-    elemento.timer = setInterval(()=>{
+    elemento.timer = setInterval(() => {
 
         numero++;
 
         elemento.innerHTML = numero;
 
-        if(numero >= destino){
+        if (numero >= destino) {
 
             elemento.innerHTML = destino;
 
@@ -827,7 +828,7 @@ function animarNumero(elemento, destino){
 
         }
 
-    },25);
+    }, 25);
 
 }
 
@@ -835,7 +836,7 @@ function animarNumero(elemento, destino){
 ATUALIZAÇÃO GERAL
 ==================================================*/
 
-function atualizarSistema(){
+function atualizarSistema() {
 
     carregarTabela();
 
@@ -847,31 +848,31 @@ function atualizarSistema(){
 EXEMPLO DE CADASTRO
 ==================================================*/
 
-function cadastrarExemplo(){
+function cadastrarExemplo() {
 
     atividades.push({
 
         id: gerarID(),
 
-        local:"Moega",
+        local: "Moega",
 
-        area:"Descarga",
+        area: "Descarga",
 
-        atividade:"Lavagem do Piso",
+        atividade: "Lavagem do Piso",
 
-        responsavel:"Pedro Alves",
+        encarregado: "Rayan Cardoso",
 
-        equipe:"Equipe C",
+        colaborador: "Pedro Alves",
 
-        prioridade:"Alta",
+        prioridade: "Alta",
 
-        status:"Pendente",
+        status: "Pendente",
 
-        inicio:"09:15",
+        inicio: "09:15",
 
-        prazo:"13:00",
+        prazo: "13:00",
 
-        progresso:0
+        progresso: 0
 
     });
 
@@ -925,9 +926,9 @@ VERIFICA FIREBASE
 
 let firebaseAtivo = false;
 
-try{
+try {
 
-    if(typeof firebase !== "undefined"){
+    if (typeof firebase !== "undefined") {
 
         firebase.initializeApp(firebaseConfig);
 
@@ -937,7 +938,7 @@ try{
 
     }
 
-}catch(e){
+} catch (e) {
 
     console.log("Firebase ainda não configurado.");
 
@@ -949,7 +950,7 @@ REFERÊNCIA FIRESTORE
 
 let db = null;
 
-if(firebaseAtivo){
+if (firebaseAtivo) {
 
     db = firebase.firestore();
 
@@ -959,11 +960,11 @@ if(firebaseAtivo){
 SALVAR ATIVIDADE
 ==================================================*/
 
-async function salvarFirebase(atividade){
+async function salvarFirebase(atividade) {
 
-    if(!firebaseAtivo) return;
+    if (!firebaseAtivo) return;
 
-    try{
+    try {
 
         await db.collection("atividades").add(atividade);
 
@@ -971,7 +972,7 @@ async function salvarFirebase(atividade){
 
     }
 
-    catch(erro){
+    catch (erro) {
 
         console.error(erro);
 
@@ -983,9 +984,9 @@ async function salvarFirebase(atividade){
 CARREGAR
 ==================================================*/
 
-async function carregarFirebase(){
+async function carregarFirebase() {
 
-    if(!firebaseAtivo){
+    if (!firebaseAtivo) {
 
         atualizarSistema();
 
@@ -993,15 +994,15 @@ async function carregarFirebase(){
 
     }
 
-    atividades=[];
+    atividades = [];
 
-    const snapshot=await db.collection("atividades").get();
+    const snapshot = await db.collection("atividades").get();
 
-    snapshot.forEach(doc=>{
+    snapshot.forEach(doc => {
 
         atividades.push({
 
-            id:doc.id,
+            id: doc.id,
 
             ...doc.data()
 
@@ -1017,31 +1018,31 @@ async function carregarFirebase(){
 ATUALIZAÇÃO EM TEMPO REAL
 ==================================================*/
 
-function realtimeFirebase(){
+function realtimeFirebase() {
 
-    if(!firebaseAtivo) return;
+    if (!firebaseAtivo) return;
 
     db.collection("atividades")
 
-    .onSnapshot(snapshot=>{
+        .onSnapshot(snapshot => {
 
-        atividades=[];
+            atividades = [];
 
-        snapshot.forEach(doc=>{
+            snapshot.forEach(doc => {
 
-            atividades.push({
+                atividades.push({
 
-                id:doc.id,
+                    id: doc.id,
 
-                ...doc.data()
+                    ...doc.data()
+
+                });
 
             });
 
+            atualizarSistema();
+
         });
-
-        atualizarSistema();
-
-    });
 
 }
 
@@ -1049,9 +1050,9 @@ function realtimeFirebase(){
 EXCLUIR
 ==================================================*/
 
-async function excluirFirebase(id){
+async function excluirFirebase(id) {
 
-    if(!firebaseAtivo){
+    if (!firebaseAtivo) {
 
         excluirAtividade(id);
 
@@ -1061,9 +1062,9 @@ async function excluirFirebase(id){
 
     await db.collection("atividades")
 
-    .doc(id)
+        .doc(id)
 
-    .delete();
+        .delete();
 
 }
 
@@ -1071,15 +1072,15 @@ async function excluirFirebase(id){
 NOVA ATIVIDADE
 ==================================================*/
 
-async function novaAtividadeFirebase(objeto){
+async function novaAtividadeFirebase(objeto) {
 
-    if(firebaseAtivo){
+    if (firebaseAtivo) {
 
         await salvarFirebase(objeto);
 
     }
 
-    else{
+    else {
 
         adicionarAtividade(objeto);
 
@@ -1091,15 +1092,15 @@ async function novaAtividadeFirebase(objeto){
 INICIALIZAÇÃO
 ==================================================*/
 
-window.addEventListener("load",()=>{
+window.addEventListener("load", () => {
 
-    if(firebaseAtivo){
+    if (firebaseAtivo) {
 
         realtimeFirebase();
 
     }
 
-    else{
+    else {
 
         atualizarSistema();
 
@@ -1112,11 +1113,133 @@ FIM DO SCRIPT
 ==================================================*/
 
 console.log(
-"%cHOUSEKEEPING TERMINAL TOEX",
-"font-size:22px;color:#0D2F5C;font-weight:bold;"
+    "%cHOUSEKEEPING TERMINAL TOEX",
+    "font-size:22px;color:#0D2F5C;font-weight:bold;"
 );
 
 console.log(
-"%cSistema carregado com sucesso.",
-"color:#2CBF6E;"
+    "%cSistema carregado com sucesso.",
+    "color:#2CBF6E;"
 );
+
+/*==================================================
+EXPORTAR PDF
+==================================================*/
+
+async function exportarPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF("landscape");
+
+    // Cabeçalho
+    doc.setFontSize(20);
+    doc.setTextColor(13, 47, 92);
+    doc.text("HOUSEKEEPING - TERMINAL TOEX", 14, 18);
+
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+
+    doc.text(
+        "Relatório de Atividades",
+        14,
+        26
+    );
+
+    // Dados da tabela
+    let linhas = [];
+
+    atividades.forEach(item => {
+
+        linhas.push([
+
+            item.id,
+            item.local,
+            item.area,
+            item.atividade,
+            item.encarregado,
+            item.colaborador,
+            item.status,
+            item.progresso + "%"
+
+        ]);
+
+    });
+
+    doc.autoTable({
+
+        startY: 35,
+
+        head: [[
+            "ID",
+
+            "Local",
+
+            "Área",
+
+            "Atividade",
+
+            "Encarregado",
+
+            "Colaborador",
+
+            "Status",
+
+            "%"
+        ]],
+
+        body: linhas,
+
+        theme: "grid"
+
+    });
+
+    const hoje = new Date();
+
+    const arquivo = `Housekeeping_${hoje.getDate()}-${hoje.getMonth() + 1}-${hoje.getFullYear()}.pdf`;
+
+    doc.save(arquivo);
+
+}
+
+/*==================================================
+MODAL NOVA ATIVIDADE
+==================================================*/
+
+const modal = document.getElementById("modalNovaAtividade");
+
+const btnNova = document.querySelector(".btn-nova");
+
+const btnFechar = document.getElementById("fecharModal");
+
+const btnCancelar = document.getElementById("cancelarModal");
+
+if(btnNova){
+
+    btnNova.addEventListener("click",()=>{
+
+        modal.classList.add("active");
+
+    });
+
+}
+
+if(btnFechar){
+
+    btnFechar.addEventListener("click",()=>{
+
+        modal.classList.remove("active");
+
+    });
+
+}
+
+if(btnCancelar){
+
+    btnCancelar.addEventListener("click",()=>{
+
+        modal.classList.remove("active");
+
+    });
+
+}

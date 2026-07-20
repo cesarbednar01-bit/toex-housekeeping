@@ -15,194 +15,741 @@
 
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600&family=Roboto:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
 
-    <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 </head>
 
 <body>
 
-<div class="dashboard">
+    <div class="dashboard">
 
-    <!--====================================-->
-    <!-- HEADER -->
-    <!--====================================-->
+        <!--====================================-->
+        <!-- HEADER -->
+        <!--====================================-->
 
-    <header class="topo">
+        <header class="topo">
 
-        <div class="empresa">
+            <div class="empresa">
 
-            <img src="logo.png">
+                <img src="logo.png">
 
-        </div>
+            </div>
 
-        <div class="titulo">
+            <div class="titulo">
 
-            <h1>
+                <h1>
 
-                HOUSEKEEPING - TERMINAL TOEX
+                    HOUSEKEEPING
 
-            </h1>
+                </h1>
 
-            <span>
+                <span>
 
-                ACOMPANHAMENTO DE ATIVIDADES
+                    ACOMPANHAMENTO DE ATIVIDADES
 
-            </span>
+                </span>
 
-        </div>
+            </div>
 
-        <div class="informacoes">
+            <div class="informacoes">
 
-            <div class="info">
+                <div class="info">
 
-                <i class="fa-regular fa-calendar-days"></i>
+                    <i class="fa-regular fa-calendar-days"></i>
+
+                    <div>
+
+                        <small>ATUALIZAÇÃO:</small>
+
+                        <strong id="dataHora">
+
+                            16/07/2026 08:30
+
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="periodo">
+
+                    <small>PERÍODO</small>
+
+                    <input type="text" value="10/07/2026 á 16/07/2026">
+
+                </div>
+
+            </div>
+
+        </header>
+
+        <!--====================================-->
+        <!-- CARDS KPI -->
+        <!--====================================-->
+
+        <section class="cards">
+
+            <!-- TOTAL -->
+
+            <div class="card azul">
+
+                <div class="icone">
+
+                    <i class="fa-regular fa-clipboard"></i>
+
+                </div>
+
+                <div class="conteudo">
+
+                    <small>TOTAL ATIVIDADES</small>
+
+                    <h2>28</h2>
+
+                </div>
+
+            </div>
+
+            <!-- CONCLUÍDAS -->
+
+            <div class="card verde">
+
+                <div class="icone">
+
+                    <i class="fa-regular fa-circle-check"></i>
+
+                </div>
+
+                <div class="conteudo">
+
+                    <small>CONCLUÍDAS</small>
+
+                    <h2>14</h2>
+
+                </div>
+
+            </div>
+
+            <!-- EM ANDAMENTO -->
+
+            <div class="card amarelo">
+
+                <div class="icone">
+
+                    <i class="fa-solid fa-gear"></i>
+
+                </div>
+
+                <div class="conteudo">
+
+                    <small>EM ANDAMENTO</small>
+
+                    <h2>8</h2>
+
+                </div>
+
+            </div>
+
+            <!-- PENDENTES -->
+
+            <div class="card cinza">
+
+                <div class="icone">
+
+                    <i class="fa-regular fa-file-lines"></i>
+
+                </div>
+
+                <div class="conteudo">
+
+                    <small>PENDENTES</small>
+
+                    <h2>2</h2>
+
+                </div>
+
+            </div>
+
+            <!-- ATRASADAS -->
+
+            <div class="card vermelho">
+
+                <div class="icone">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                </div>
+
+                <div class="conteudo">
+
+                    <small>ATRASADAS</small>
+
+                    <h2>4</h2>
+
+                </div>
+
+            </div>
+
+            <!-- EFETIVIDADE -->
+
+            <div class="card branco">
+
+                <div class="conteudo-centro">
+
+                    <small>% CONCLUSÃO</small>
+
+                    <div class="grafico-circle">
+
+                        <span>50%</span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!--====================================-->
+        <!-- GRÁFICOS -->
+        <!--====================================-->
+
+        <section class="graficos">
+
+            <!-- STATUS -->
+
+            <div class="painel">
+
+                <div class="painel-header">
+
+                    <i class="fa-solid fa-chart-pie"></i>
+
+                    <h3>Status das Atividades</h3>
+
+                </div>
+
+                <div class="painel-body">
+
+                    <canvas id="graficoStatus"></canvas>
+
+                </div>
+
+            </div>
+
+            <!-- RESPONSÁVEL -->
+
+            <div class="painel">
+
+                <div class="painel-header">
+
+                    <i class="fa-solid fa-users"></i>
+
+                    <h3>Atividades por Colaborador</h3>
+
+                </div>
+
+                <div class="painel-body">
+
+                    <canvas id="graficoColaborador"></canvas>
+
+                </div>
+
+            </div>
+
+            <!-- ÁREA -->
+
+            <div class="painel">
+
+                <div class="painel-header">
+
+                    <i class="fa-solid fa-industry"></i>
+
+                    <h3>Atividades por Área</h3>
+
+                </div>
+
+                <div class="painel-body">
+
+                    <canvas id="graficoArea"></canvas>
+
+                </div>
+
+            </div>
+
+            <!-- CRITICIDADE -->
+
+            <div class="painel">
+
+                <div class="painel-header">
+
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+
+                    <h3>Criticidade</h3>
+
+                </div>
+
+                <div class="painel-body">
+
+                    <canvas id="graficoCriticidade"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!--====================================-->
+        <!-- EFETIVIDADE OPERACIONAL -->
+        <!--====================================-->
+
+        <section class="efetividade">
+
+            <div class="efetividade-card">
+
+                <div class="efetividade-info">
+
+                    <span>EFETIVIDADE OPERACIONAL</span>
+
+                    <h2>92%</h2>
+
+                    <p>Meta do dia: <strong>90%</strong></p>
+
+                </div>
+
+                <div class="barra-efetividade">
+
+                    <div class="barra">
+
+                        <div class="progresso" style="width:92%;"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!--====================================-->
+        <!-- TABELA DE ATIVIDADES -->
+        <!--====================================-->
+
+        <section class="tabela-container">
+
+            <div class="tabela-header">
 
                 <div>
 
-                    <small>ATUALIZAÇÃO:</small>
+                    <h2>LISTA OPERACIONAL DE ATIVIDADES</h2>
 
-                    <strong id="dataHora">
+                    <span>Acompanhamento em tempo real</span>
 
-                        16/07/2026 08:30
+                </div>
 
-                    </strong>
+                <div class="acoes">
+
+                    <button class="btn-exportar" id="btnPDF">
+
+                        <i class="fa-solid fa-file-pdf"></i>
+
+                        Exportar PDF
+
+                    </button>
+
+                    <button class="btn-imprimir">
+                        <i class="fa-solid fa-print"></i>
+                        Imprimir
+                    </button>
+
+                    <button class="btn-nova">
+                        <i class="fa-solid fa-plus"></i>
+                        Nova Atividade
+                    </button>
 
                 </div>
 
             </div>
 
-            <div class="periodo">
+            <div class="tabela-scroll">
 
-                <small>PERÍODO</small>
+                <table>
 
-                <input type="text" value="10/07/2026 á 16/07/2026">
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Local</th>
+                            <th>Área</th>
+                            <th>Atividade</th>
+                            <th>Encarregado</th>
+                            <th>Colaborador</th>
+                            <th>Prioridade</th>
+                            <th>Status</th>
+                            <th>Início</th>
+                            <th>Prazo</th>
+                            <th>%</th>
+                            <th>Ações</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+
+                            <td>001</td>
+                            <td>Armazém 01</td>
+                            <td>Recebimento</td>
+                            <td>Limpeza Geral</td>
+                            <td>Carlos Silva</td>
+                            <td>Equipe A</td>
+
+                            <td>
+                                <span class="prioridade alta">
+                                    Alta
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="status andamento">
+                                    Em andamento
+                                </span>
+                            </td>
+
+                            <td>07:30</td>
+
+                            <td>11:00</td>
+
+                            <td>
+
+                                <div class="mini-barra">
+
+                                    <div class="mini-progresso" style="width:60%;"></div>
+
+                                </div>
+
+                                60%
+
+                            </td>
+
+                            <td>
+
+                                <button class="acao visualizar">
+
+                                    <i class="fa-solid fa-eye"></i>
+
+                                </button>
+
+                                <button class="acao editar">
+
+                                    <i class="fa-solid fa-pen"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        <tr>
+
+                            <td>002</td>
+                            <td>Pátio</td>
+                            <td>Expedição</td>
+                            <td>Organização de Materiais</td>
+                            <td>Marcos Lima</td>
+                            <td>Equipe B</td>
+
+                            <td>
+
+                                <span class="prioridade media">
+
+                                    Média
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="status concluido">
+
+                                    Concluído
+
+                                </span>
+
+                            </td>
+
+                            <td>08:00</td>
+
+                            <td>10:30</td>
+
+                            <td>
+
+                                <div class="mini-barra">
+
+                                    <div class="mini-progresso" style="width:100%;"></div>
+
+                                </div>
+
+                                100%
+
+                            </td>
+
+                            <td>
+
+                                <button class="acao visualizar">
+
+                                    <i class="fa-solid fa-eye"></i>
+
+                                </button>
+
+                                <button class="acao editar">
+
+                                    <i class="fa-solid fa-pen"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
 
             </div>
 
-        </div>
+        </section>
 
-    </header>
+    </div>
 
-        <!--====================================-->
-    <!-- CARDS KPI -->
-    <!--====================================-->
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <section class="cards">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        <!-- TOTAL -->
+    <!-- AutoTable -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
-        <div class="card azul">
+    <!-- Script do sistema -->
+    <script src="script.js"></script>
 
-            <div class="icone">
+    <!-- ==================================================
+MODAL NOVA ATIVIDADE
+================================================== -->
 
-                <i class="fa-regular fa-clipboard"></i>
+    <div class="modal-overlay" id="modalNovaAtividade">
 
-            </div>
+        <div class="modal">
 
-            <div class="conteudo">
+            <div class="modal-header">
 
-                <small>TOTAL ATIVIDADES</small>
+                <div>
 
-                <h2>28</h2>
+                    <h2>
+                        <i class="fa-solid fa-plus"></i>
+                        Nova Atividade
+                    </h2>
 
-            </div>
+                    <span>Cadastro de atividade operacional</span>
 
-        </div>
+                </div>
 
-        <!-- CONCLUÍDAS -->
+                <button class="btn-fechar" id="fecharModal">
 
-        <div class="card verde">
+                    <i class="fa-solid fa-xmark"></i>
 
-            <div class="icone">
-
-                <i class="fa-regular fa-circle-check"></i>
-
-            </div>
-
-            <div class="conteudo">
-
-                <small>CONCLUÍDAS</small>
-
-                <h2>14</h2>
+                </button>
 
             </div>
 
-        </div>
+            <div class="modal-body">
 
-        <!-- EM ANDAMENTO -->
+                <div class="grupo">
 
-        <div class="card amarelo">
+                    <div class="campo">
 
-            <div class="icone">
+                        <label>Local</label>
 
-                <i class="fa-solid fa-gear"></i>
+                        <select id="local">
 
-            </div>
+                            <option value="">Selecione...</option>
 
-            <div class="conteudo">
+                            <option>Armazém 01</option>
+                            <option>Armazém 02</option>
+                            <option>Pátio</option>
+                            <option>Moega</option>
+                            <option>Recepção</option>
 
-                <small>EM ANDAMENTO</small>
+                        </select>
 
-                <h2>8</h2>
+                    </div>
 
-            </div>
+                    <div class="campo">
 
-        </div>
+                        <label>Área</label>
 
-        <!-- PENDENTES -->
+                        <select id="area">
 
-        <div class="card cinza">
+                            <option value="">Selecione...</option>
 
-            <div class="icone">
+                            <option>Recebimento</option>
+                            <option>Expedição</option>
+                            <option>Limpeza</option>
+                            <option>Administrativo</option>
 
-                <i class="fa-regular fa-file-lines"></i>
+                        </select>
 
-            </div>
+                    </div>
 
-            <div class="conteudo">
+                </div>
 
-                <small>PENDENTES</small>
+                <div class="campo">
 
-                <h2>2</h2>
+                    <label>Atividade</label>
 
-            </div>
+                    <div class="grupo">
 
-        </div>
+                        <div class="campo">
 
-        <!-- ATRASADAS -->
+                            <label>Encarregado</label>
 
-        <div class="card vermelho">
+                            <select id="encarregado">
 
-            <div class="icone">
+                                <option value="">Selecione...</option>
 
-                <i class="fa-solid fa-triangle-exclamation"></i>
+                                <option>Rayan Cardoso</option>
+                                <option>João Pereira</option>
+                                <option>Marcos Silva</option>
 
-            </div>
+                            </select>
 
-            <div class="conteudo">
+                        </div>
 
-                <small>ATRASADAS</small>
+                        <div class="campo">
 
-                <h2>4</h2>
+                            <label>Colaborador</label>
 
-            </div>
+                            <select id="colaborador">
 
-        </div>
+                                <option value="">Selecione...</option>
 
-        <!-- EFETIVIDADE -->
+                                <option>Carlos Silva</option>
+                                <option>Pedro Alves</option>
+                                <option>Lucas Souza</option>
+                                <option>Marcos Andrade</option>
 
-        <div class="card branco">
+                            </select>
 
-            <div class="conteudo-centro">
+                        </div>
 
-                <small>% CONCLUSÃO</small>
+                    </div>
 
-                <div class="grafico-circle">
+                    <div class="grupo">
 
-                    <span>50%</span>
+                        <div class="campo">
+
+                            <label>Prioridade</label>
+
+                            <select id="prioridade">
+
+                                <option>Baixa</option>
+                                <option>Média</option>
+                                <option>Alta</option>
+                                <option>Crítica</option>
+
+                            </select>
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label>Status</label>
+
+                            <select id="status">
+
+                                <option>Pendente</option>
+                                <option>Em andamento</option>
+                                <option>Concluído</option>
+                                <option>Atrasado</option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                    <div class="grupo">
+
+                        <div class="campo">
+
+                            <label>Data de Início</label>
+
+                            <input type="date" id="inicio">
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label>Prazo</label>
+
+                            <input type="date" id="prazo">
+
+                        </div>
+
+                    </div>
+
+                    <div class="grupo">
+
+                        <div class="campo">
+
+                            <label>Conclusão (%)</label>
+
+                            <input type="number" id="progresso" value="0" min="0" max="100">
+
+                        </div>
+
+                        <div class="campo">
+
+                            <label>Anexar Foto</label>
+
+                            <input type="file" id="foto" accept="image/*">
+
+                        </div>
+
+                    </div>
+
+                    <div class="campo">
+
+                        <label>Observações</label>
+
+                        <textarea id="observacao" rows="5" placeholder="Digite observações da atividade..."></textarea>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button class="btn-cancelar" id="cancelarModal">
+
+                        Cancelar
+
+                    </button>
+
+                    <button class="btn-salvar" id="salvarAtividade">
+
+                        <i class="fa-solid fa-floppy-disk"></i>
+
+                        Salvar Atividade
+
+                    </button>
 
                 </div>
 
@@ -210,323 +757,10 @@
 
         </div>
 
-    </section>
+        <input type="text" id="atividade" placeholder="Descrição da atividade">
 
-        <!--====================================-->
-    <!-- GRÁFICOS -->
-    <!--====================================-->
+    </div>
 
-    <section class="graficos">
-
-        <!-- STATUS -->
-
-        <div class="painel">
-
-            <div class="painel-header">
-
-                <i class="fa-solid fa-chart-pie"></i>
-
-                <h3>Status das Atividades</h3>
-
-            </div>
-
-            <div class="painel-body">
-
-                <canvas id="graficoStatus"></canvas>
-
-            </div>
-
-        </div>
-
-        <!-- RESPONSÁVEL -->
-
-        <div class="painel">
-
-            <div class="painel-header">
-
-                <i class="fa-solid fa-users"></i>
-
-                <h3>Atividades por Responsável</h3>
-
-            </div>
-
-            <div class="painel-body">
-
-                <canvas id="graficoResponsavel"></canvas>
-
-            </div>
-
-        </div>
-
-        <!-- ÁREA -->
-
-        <div class="painel">
-
-            <div class="painel-header">
-
-                <i class="fa-solid fa-industry"></i>
-
-                <h3>Atividades por Área</h3>
-
-            </div>
-
-            <div class="painel-body">
-
-                <canvas id="graficoArea"></canvas>
-
-            </div>
-
-        </div>
-
-        <!-- CRITICIDADE -->
-
-        <div class="painel">
-
-            <div class="painel-header">
-
-                <i class="fa-solid fa-triangle-exclamation"></i>
-
-                <h3>Criticidade</h3>
-
-            </div>
-
-            <div class="painel-body">
-
-                <canvas id="graficoCriticidade"></canvas>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!--====================================-->
-    <!-- EFETIVIDADE OPERACIONAL -->
-    <!--====================================-->
-
-    <section class="efetividade">
-
-        <div class="efetividade-card">
-
-            <div class="efetividade-info">
-
-                <span>EFETIVIDADE OPERACIONAL</span>
-
-                <h2>92%</h2>
-
-                <p>Meta do dia: <strong>90%</strong></p>
-
-            </div>
-
-            <div class="barra-efetividade">
-
-                <div class="barra">
-
-                    <div class="progresso" style="width:92%;"></div>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-        <!--====================================-->
-    <!-- TABELA DE ATIVIDADES -->
-    <!--====================================-->
-
-    <section class="tabela-container">
-
-        <div class="tabela-header">
-
-            <div>
-
-                <h2>LISTA OPERACIONAL DE ATIVIDADES</h2>
-
-                <span>Acompanhamento em tempo real</span>
-
-            </div>
-
-            <div class="acoes">
-
-                <button class="btn-exportar">
-                    <i class="fa-solid fa-file-excel"></i>
-                    Exportar
-                </button>
-
-                <button class="btn-imprimir">
-                    <i class="fa-solid fa-print"></i>
-                    Imprimir
-                </button>
-
-                <button class="btn-nova">
-                    <i class="fa-solid fa-plus"></i>
-                    Nova Atividade
-                </button>
-
-            </div>
-
-        </div>
-
-        <div class="tabela-scroll">
-
-            <table>
-
-                <thead>
-
-                    <tr>
-
-                        <th>ID</th>
-                        <th>Local</th>
-                        <th>Área</th>
-                        <th>Atividade</th>
-                        <th>Responsável</th>
-                        <th>Equipe</th>
-                        <th>Prioridade</th>
-                        <th>Status</th>
-                        <th>Início</th>
-                        <th>Prazo</th>
-                        <th>%</th>
-                        <th>Ações</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    <tr>
-
-                        <td>001</td>
-                        <td>Armazém 01</td>
-                        <td>Recebimento</td>
-                        <td>Limpeza Geral</td>
-                        <td>Carlos Silva</td>
-                        <td>Equipe A</td>
-
-                        <td>
-                            <span class="prioridade alta">
-                                Alta
-                            </span>
-                        </td>
-
-                        <td>
-                            <span class="status andamento">
-                                Em andamento
-                            </span>
-                        </td>
-
-                        <td>07:30</td>
-
-                        <td>11:00</td>
-
-                        <td>
-
-                            <div class="mini-barra">
-
-                                <div class="mini-progresso" style="width:60%;"></div>
-
-                            </div>
-
-                            60%
-
-                        </td>
-
-                        <td>
-
-                            <button class="acao visualizar">
-
-                                <i class="fa-solid fa-eye"></i>
-
-                            </button>
-
-                            <button class="acao editar">
-
-                                <i class="fa-solid fa-pen"></i>
-
-                            </button>
-
-                        </td>
-
-                    </tr>
-
-                    <tr>
-
-                        <td>002</td>
-                        <td>Pátio</td>
-                        <td>Expedição</td>
-                        <td>Organização de Materiais</td>
-                        <td>Marcos Lima</td>
-                        <td>Equipe B</td>
-
-                        <td>
-
-                            <span class="prioridade media">
-
-                                Média
-
-                            </span>
-
-                        </td>
-
-                        <td>
-
-                            <span class="status concluido">
-
-                                Concluído
-
-                            </span>
-
-                        </td>
-
-                        <td>08:00</td>
-
-                        <td>10:30</td>
-
-                        <td>
-
-                            <div class="mini-barra">
-
-                                <div class="mini-progresso" style="width:100%;"></div>
-
-                            </div>
-
-                            100%
-
-                        </td>
-
-                        <td>
-
-                            <button class="acao visualizar">
-
-                                <i class="fa-solid fa-eye"></i>
-
-                            </button>
-
-                            <button class="acao editar">
-
-                                <i class="fa-solid fa-pen"></i>
-
-                            </button>
-
-                        </td>
-
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </section>
-
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script src="script.js"></script>
 
 </body>
 
