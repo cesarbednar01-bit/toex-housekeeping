@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | Housekeeping TOEX</title>
+
+    <link rel="stylesheet" href="login.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+</head>
+
+<body>
+
+    <div class="container-login">
+
+        <!-- LADO ESQUERDO -->
+
+        <div class="lado-esquerdo">
+
+            <img src="logo.png" alt="TOEX">
+
+            <h1>HOUSEKEEPING</h1>
+
+            <h2>Management System</h2>
+
+            <p>
+
+                Sistema de Gestão das Atividades de Housekeeping
+
+                <br><br>
+
+                Terminal TOEX
+
+            </p>
+
+        </div>
+
+        <!-- LADO DIREITO -->
+
+        <div class="lado-direito">
+
+            <div class="login-box">
+
+                <h2>Bem-vindo</h2>
+
+                <span>
+
+                    Faça login para acessar o sistema
+
+                </span>
+
+                <!-- USUÁRIO -->
+
+                <div class="campo">
+
+                    <label>
+
+                        <i class="fa-solid fa-user"></i>
+
+                        Usuário
+
+                    </label>
+
+                    <input
+
+                        type="text"
+
+                        id="usuario"
+
+                        placeholder="Digite seu usuário">
+
+                </div>
+
+                <!-- SENHA -->
+
+                <div class="campo">
+
+                    <label>
+
+                        <i class="fa-solid fa-lock"></i>
+
+                        Senha
+
+                    </label>
+
+                    <div class="senha-box">
+
+                        <input
+
+                            type="password"
+
+                            id="senha"
+
+                            placeholder="Digite sua senha">
+
+                        <button
+
+                            id="mostrarSenha"
+
+                            type="button">
+
+                            <i class="fa-solid fa-eye"></i>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <button
+
+                    class="btn-login"
+
+                    id="btnEntrar">
+
+                    <i class="fa-solid fa-right-to-bracket"></i>
+
+                    Entrar
+
+                </button>
+
+                <p class="versao">
+
+                    Housekeeping Management System
+
+                    <br>
+
+                    Versão 4.0
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="login.js"></script>
+
+</body>
+
+</html>
