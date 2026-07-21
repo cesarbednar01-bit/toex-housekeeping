@@ -1,162 +1,152 @@
-/*==================================================
-HOUSEKEEPING MANAGEMENT SYSTEM
-TERMINAL TOEX
-VERSÃO 2.0
-==================================================*/
+/*=========================================================
+    HOUSEKEEPING MANAGEMENT SYSTEM v4.0
+    TERMINAL TOEX
 
-document.addEventListener("DOMContentLoaded", () => {
+    Desenvolvido em:
+    HTML5
+    CSS3
+    JavaScript ES6+
 
-    iniciarSistema();
+=========================================================*/
 
-});
 
-/*==================================================
-INICIALIZAÇÃO
-==================================================*/
+/*=========================================================
+    CONFIGURAÇÕES GLOBAIS
+=========================================================*/
 
-function iniciarSistema() {
+"use strict";
 
-    atualizarDataHora();
 
-    setInterval(atualizarDataHora, 1000);
+const CONFIG = {
 
-    animarCards();
+    sistema: "HOUSEKEEPING TOEX",
 
-    configurarBotoes();
+    versao: "4.0",
 
-}
+    atualizarRelogio: 60000,
 
-/*==================================================
-DATA E HORA
-==================================================*/
+    progressoMaximo: 100
 
-function atualizarDataHora() {
+};
 
-    const elemento = document.getElementById("dataHora");
 
-    if (!elemento) return;
 
-    const agora = new Date();
+/*=========================================================
+    ESTADO GLOBAL DA APLICAÇÃO
+=========================================================*/
 
-    const dia = String(agora.getDate()).padStart(2, "0");
+const state = {
 
-    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    atividades: [],
 
-    const ano = agora.getFullYear();
+    atividadeSelecionada: null,
 
-    const hora = String(agora.getHours()).padStart(2, "0");
+    atividadeEditando: null,
 
-    const minuto = String(agora.getMinutes()).padStart(2, "0");
+    charts: {},
 
-    const segundo = String(agora.getSeconds()).padStart(2, "0");
+    firebaseInicializado: false,
 
-    elemento.innerHTML =
-        `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
+    carregando: false,
 
-}
+    elementos: {}
 
-/*==================================================
-ANIMAÇÃO DOS CARDS
-==================================================*/
+};
 
-function animarCards() {
 
-    const cards = document.querySelectorAll(".card");
 
-    cards.forEach((card, index) => {
+/*=========================================================
+    CACHE DOS ELEMENTOS HTML
+=========================================================*/
 
-        card.style.opacity = "0";
+function cacheDOM() {
 
-        card.style.transform = "translateY(25px)";
+    state.elementos = {
 
-        setTimeout(() => {
+        // HEADER
 
-            card.style.transition = ".5s";
+        dataHora: document.getElementById("dataHora"),
 
-            card.style.opacity = "1";
 
-            card.style.transform = "translateY(0px)";
+        // BOTÕES
 
-        }, index * 120);
+        btnNova: document.querySelector(".btn-nova"),
 
-    });
+        btnPDF: document.getElementById("btnPDF"),
 
-}
+        btnImprimir: document.querySelector(".btn-imprimir"),
 
-/*==================================================
-BOTÕES
-==================================================*/
 
-function configurarBotoes() {
+        // MODAL
 
-    const btnNova = document.querySelector(".btn-nova");
+        modal: document.getElementById("modalNovaAtividade"),
 
-    const btnPDF = document.querySelector(".btn-exportar");
+        fecharModal: document.getElementById("fecharModal"),
 
-    const btnPrint = document.querySelector(".btn-imprimir");
+        cancelarModal: document.getElementById("cancelarModal"),
 
-   if (btnNova) {
+        salvarAtividade: document.getElementById("salvarAtividade"),
 
-    btnNova.addEventListener("click", () => {
 
-        modal.classList.add("active");
+        // CAMPOS
 
-    });
+        local: document.getElementById("local"),
 
-}
+        area: document.getElementById("area"),
 
-    if (btnPDF) {
+        atividade: document.getElementById("atividade"),
 
-        btnPDF.addEventListener("click", exportarPDF);
+        encarregado: document.getElementById("encarregado"),
 
+        colaborador: document.getElementById("colaborador"),
+
+        prioridade: document.getElementById("prioridade"),
+
+        status: document.getElementById("status"),
+
+        inicio: document.getElementById("inicio"),
+
+        prazo: document.getElementById("prazo"),
+
+        progresso: document.getElementById("progresso"),
+
+        foto: document.getElementById("foto"),
+
+        observacao: document.getElementById("observacao"),
+
+
+        // TABELA
+
+        tabela: document.getElementById("tabelaAtividades"),
+
+
+        // GRÁFICOS
+
+        graficoStatus:
+
+            document.getElementById("graficoStatus"),
+
+        graficoArea:
+
+            document.getElementById("graficoArea"),
+
+        graficoColaborador:
+
+            document.getElementById("graficoColaborador"),
+
+        graficoCriticidade:
+
+            document.getElementById("graficoCriticidade")
 
     };
 
-
-
-    if (btnPrint) {
-
-        btnPrint.addEventListener("click", () => {
-
-            window.print();
-
-        });
-
-    }
-
 }
 
-/*==================================================
-ATUALIZAÇÃO DOS KPIs
-==================================================*/
 
-function atualizarKPIs() {
 
-    document.querySelector(".azul h2").innerHTML = "28";
-
-    document.querySelector(".verde h2").innerHTML = "14";
-
-    document.querySelector(".amarelo h2").innerHTML = "8";
-
-    document.querySelector(".cinza h2").innerHTML = "2";
-
-    document.querySelector(".vermelho h2").innerHTML = "4";
-
-    document.querySelector(".grafico-circle span").innerHTML = "50%";
-
-}
-
-atualizarKPIs();
-
-/*==================================================
-UTILITÁRIOS
-==================================================*/
-
-function formatarNumero(numero) {
-
-    return numero.toLocaleString("pt-BR");
-
-}
+/*=========================================================
+    UTILITÁRIOS
+=========================================================*/
 
 function gerarID() {
 
@@ -164,36 +154,734 @@ function gerarID() {
 
 }
 
-console.log("%cHOUSEKEEPING TOEX",
-    "color:#0D2F5C;font-size:22px;font-weight:bold");
 
-console.log("%cSistema iniciado com sucesso.",
-    "color:#2CBF6E;font-size:14px");
+function formatarNumero(numero) {
 
-/*==================================================
-CHART.JS
-==================================================*/
+    return Number(numero).toLocaleString("pt-BR");
 
-let graficoStatus;
-let graficoColaborador;
-let graficoArea;
-let graficoCriticidade;
+}
 
-/*==================================================
-CRIAR GRÁFICOS
-==================================================*/
 
-document.addEventListener("DOMContentLoaded", () => {
+function formatarData(data) {
 
-    criarGraficos();
+    if (!data) return "";
 
-});
+    return new Date(data).toLocaleDateString("pt-BR");
 
-/*==================================================
-STATUS
-==================================================*/
+}
 
-function criarGraficos() {
+
+function formatarHora() {
+
+    return new Date().toLocaleTimeString("pt-BR", {
+
+        hour: "2-digit",
+
+        minute: "2-digit"
+
+    });
+
+}
+
+
+
+function atualizarDataHora() {
+
+    if (!state.elementos.dataHora) return;
+
+    const agora = new Date();
+
+    state.elementos.dataHora.textContent =
+
+        agora.toLocaleString("pt-BR");
+
+}
+
+
+
+/*=========================================================
+    MENSAGENS
+=========================================================*/
+
+function mostrarMensagem(texto) {
+
+    console.log(
+
+        `[HOUSEKEEPING] ${texto}`
+
+    );
+
+}
+
+/*=========================================================
+    INICIALIZAÇÃO DO SISTEMA
+=========================================================*/
+
+document.addEventListener("DOMContentLoaded", iniciarSistema);
+
+function iniciarSistema() {
+
+    mostrarMensagem("Inicializando sistema...");
+
+    cacheDOM();
+
+    configurarEventos();
+
+    atualizarDataHora();
+
+    setInterval(
+
+        atualizarDataHora,
+
+        CONFIG.atualizarRelogio
+
+    );
+
+    carregarAtividades();
+
+    inicializarDashboard();
+
+    renderizarSistema();
+
+    mostrarMensagem("Sistema iniciado com sucesso.");
+
+}
+
+
+
+/*=========================================================
+    EVENTOS
+=========================================================*/
+
+function configurarEventos() {
+
+    const el = state.elementos;
+
+    // NOVA ATIVIDADE
+
+    el.btnNova?.addEventListener(
+
+        "click",
+
+        abrirModal
+
+    );
+
+
+    // FECHAR MODAL
+
+    el.fecharModal?.addEventListener(
+
+        "click",
+
+        fecharModal
+
+    );
+
+    el.cancelarModal?.addEventListener(
+
+        "click",
+
+        fecharModal
+
+    );
+
+
+    // SALVAR
+
+    el.salvarAtividade?.addEventListener(
+
+        "click",
+
+        salvarNovaAtividade
+
+    );
+
+
+    // EXPORTAR PDF
+
+    el.btnPDF?.addEventListener(
+
+        "click",
+
+        exportarPDF
+
+    );
+
+
+    // IMPRIMIR
+
+    el.btnImprimir?.addEventListener(
+
+        "click",
+
+        imprimirSistema
+
+    );
+
+
+    // FECHAR MODAL CLICANDO FORA
+
+    el.modal?.addEventListener(
+
+        "click",
+
+        function (e) {
+
+            if (e.target === el.modal) {
+
+                fecharModal();
+
+            }
+
+        }
+
+    );
+
+}
+
+
+
+/*=========================================================
+    MODAL
+=========================================================*/
+
+function abrirModal() {
+
+    limparFormulario();
+
+    state.atividadeEditando = null;
+
+    state.elementos.modal.classList.add("active");
+
+}
+
+
+
+function fecharModal() {
+
+    state.elementos.modal.classList.remove("active");
+
+}
+
+
+
+function limparFormulario() {
+
+    const el = state.elementos;
+
+    el.local.value = "";
+
+    el.area.value = "";
+
+    el.atividade.value = "";
+
+    el.encarregado.value = "";
+
+    el.colaborador.value = "";
+
+    el.prioridade.value = "Baixa";
+
+    el.status.value = "Pendente";
+
+    el.inicio.value = "";
+
+    el.prazo.value = "";
+
+    el.progresso.value = 0;
+
+    el.foto.value = "";
+
+    el.observacao.value = "";
+
+}
+
+
+
+/*=========================================================
+    VALIDAÇÃO
+=========================================================*/
+
+function validarFormulario() {
+
+    const el = state.elementos;
+
+    if (el.local.value === "") {
+
+        alert("Selecione o Local.");
+
+        return false;
+
+    }
+
+    if (el.area.value === "") {
+
+        alert("Selecione a Área.");
+
+        return false;
+
+    }
+
+    if (el.atividade.value.trim() === "") {
+
+        alert("Informe a atividade.");
+
+        return false;
+
+    }
+
+    if (el.encarregado.value === "") {
+
+        alert("Selecione o Encarregado.");
+
+        return false;
+
+    }
+
+    if (el.colaborador.value === "") {
+
+        alert("Selecione o Colaborador.");
+
+        return false;
+
+    }
+
+    return true;
+
+}
+
+
+
+/*=========================================================
+    CARREGAMENTO DOS DADOS
+=========================================================*/
+
+function carregarAtividades() {
+
+    state.atividades = [];
+
+}
+
+
+
+/*=========================================================
+    RENDERIZAÇÃO PRINCIPAL
+=========================================================*/
+
+function renderizarSistema() {
+
+    atualizarKPIs();
+
+    renderizarTabela();
+
+    atualizarGraficos();
+
+}
+
+/*=========================================================
+    SALVAR NOVA ATIVIDADE
+=========================================================*/
+
+function salvarNovaAtividade() {
+
+    if (!validarFormulario()) return;
+
+    const el = state.elementos;
+
+    const atividade = {
+
+        id: gerarID(),
+
+        local: el.local.value,
+
+        area: el.area.value,
+
+        atividade: el.atividade.value.trim(),
+
+        encarregado: el.encarregado.value,
+
+        colaborador: el.colaborador.value,
+
+        prioridade: el.prioridade.value,
+
+        status: el.status.value,
+
+        inicio: el.inicio.value,
+
+        prazo: el.prazo.value,
+
+        progresso: Number(el.progresso.value),
+
+        observacao: el.observacao.value,
+
+        foto: null
+
+    };
+    if (state.atividadeEditando !== null) {
+
+        atividade.id = state.atividadeEditando;
+
+        const indice = state.atividades.findIndex(
+
+            item => item.id === state.atividadeEditando
+
+        );
+
+        if (indice !== -1) {
+
+            state.atividades[indice] = atividade;
+
+        }
+
+    } else {
+
+        state.atividades.push(atividade);
+
+    }
+
+
+    fecharModal();
+
+    renderizarSistema();
+
+}
+
+/*=========================================================
+    RENDERIZAR TABELA
+=========================================================*/
+
+function renderizarTabela() {
+
+    const tbody = state.elementos.tabela;
+
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    if (state.atividades.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="12" class="sem-registros">
+                    Nenhuma atividade cadastrada.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    state.atividades.forEach((atividade) => {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+
+            <td>${atividade.id}</td>
+
+            <td>${atividade.local}</td>
+
+            <td>${atividade.area}</td>
+
+            <td>${atividade.atividade}</td>
+
+            <td>${atividade.encarregado}</td>
+
+            <td>${atividade.colaborador}</td>
+
+            <td>
+                ${criarBadgePrioridade(atividade.prioridade)}
+            </td>
+
+            <td>
+                ${criarBadgeStatus(atividade.status)}
+            </td>
+
+            <td>${formatarData(atividade.inicio)}</td>
+
+            <td>${formatarData(atividade.prazo)}</td>
+
+            <td>${atividade.progresso}%</td>
+
+            <td>
+
+                <button
+                    class="btn-acao editar"
+                    onclick="editarAtividade(${atividade.id})">
+
+                    <i class="fa-solid fa-pen"></i>
+
+                </button>
+
+                <button
+                    class="btn-acao excluir"
+                    onclick="excluirAtividade(${atividade.id})">
+
+                    <i class="fa-solid fa-trash"></i>
+
+                </button>
+
+            </td>
+
+        `;
+
+        tbody.appendChild(tr);
+
+    });
+
+}
+
+
+
+/*=========================================================
+    BADGE PRIORIDADE
+=========================================================*/
+
+function criarBadgePrioridade(prioridade) {
+
+    return `
+        <span class="badge prioridade ${prioridade.toLowerCase()}">
+            ${prioridade}
+        </span>
+    `;
+
+}
+
+
+
+/*=========================================================
+    BADGE STATUS
+=========================================================*/
+
+function criarBadgeStatus(status) {
+
+    const classe = status
+        .toLowerCase()
+        .replace(/\s/g, "-");
+
+    return `
+        <span class="badge status ${classe}">
+            ${status}
+        </span>
+    `;
+
+}
+
+/*=========================================================
+    EDITAR ATIVIDADE
+=========================================================*/
+
+function editarAtividade(id) {
+
+    const atividade = state.atividades.find(
+
+        item => item.id === id
+
+    );
+
+    if (!atividade) return;
+
+    state.atividadeEditando = id;
+
+    const el = state.elementos;
+
+    el.local.value = atividade.local;
+
+    el.area.value = atividade.area;
+
+    el.atividade.value = atividade.atividade;
+
+    el.encarregado.value = atividade.encarregado;
+
+    el.colaborador.value = atividade.colaborador;
+
+    el.prioridade.value = atividade.prioridade;
+
+    el.status.value = atividade.status;
+
+    el.inicio.value = atividade.inicio;
+
+    el.prazo.value = atividade.prazo;
+
+    el.progresso.value = atividade.progresso;
+
+    el.observacao.value = atividade.observacao;
+
+    abrirModal(false);
+
+   }
+
+   /*=========================================================
+    MODAL
+=========================================================*/
+
+function abrirModal(limpar = true) {
+
+    if (limpar) {
+
+        limparFormulario();
+
+        state.atividadeEditando = null;
+
+    }
+
+    state.elementos.modal.classList.add("active");
+
+}
+
+
+
+/*=========================================================
+    EXCLUIR ATIVIDADE
+=========================================================*/
+
+function excluirAtividade(id) {
+
+    const atividade = state.atividades.find(
+
+        item => item.id === id
+
+    );
+
+    if (!atividade) return;
+
+    const confirmar = confirm(
+
+        `Deseja realmente excluir a atividade:\n\n${atividade.atividade}?`
+
+    );
+
+    if (!confirmar) return;
+
+    state.atividades = state.atividades.filter(
+
+        item => item.id !== id
+
+    );
+
+    renderizarSistema();
+
+}
+
+
+
+/*=========================================================
+    DUPLO CLIQUE NA LINHA
+=========================================================*/
+
+function selecionarAtividade(id) {
+
+    state.atividadeSelecionada = id;
+
+}
+
+/*=========================================================
+    ATUALIZAR KPIs
+=========================================================*/
+
+function atualizarKPIs() {
+
+    const total = state.atividades.length;
+
+    const concluidas = state.atividades.filter(
+
+        item => item.status === "Concluído"
+
+    ).length;
+
+    const andamento = state.atividades.filter(
+
+        item => item.status === "Em andamento"
+
+    ).length;
+
+    const pendentes = state.atividades.filter(
+
+        item => item.status === "Pendente"
+
+    ).length;
+
+    const atrasadas = state.atividades.filter(
+
+        item => item.status === "Atrasado"
+
+    ).length;
+
+    const percentual = total === 0
+        ? 0
+        : Math.round((concluidas / total) * 100);
+
+    atualizarCard("kpiTotal", total);
+
+    atualizarCard("kpiConcluidas", concluidas);
+
+    atualizarCard("kpiAndamento", andamento);
+
+    atualizarCard("kpiPendentes", pendentes);
+
+    atualizarCard("kpiAtrasadas", atrasadas);
+
+    atualizarCard("percentualConclusao", percentual + "%");
+
+    atualizarCard("efetividadeValor", percentual + "%");
+
+    atualizarBarraEfetividade(percentual);
+
+}
+
+/*=========================================================
+    ATUALIZAR CARD
+=========================================================*/
+
+function atualizarCard(id, valor){
+
+    const elemento = document.getElementById(id);
+
+    if(!elemento) return;
+
+    elemento.textContent = valor;
+
+}
+
+/*=========================================================
+    BARRA DE EFETIVIDADE
+=========================================================*/
+
+function atualizarBarraEfetividade(percentual){
+
+    const barra = document.getElementById("barraEfetividade");
+
+    if(!barra) return;
+
+    barra.style.width = percentual + "%";
+
+    if(percentual >= 90){
+
+        barra.style.background = "#22c55e";
+
+    }
+
+    else if(percentual >= 70){
+
+        barra.style.background = "#f59e0b";
+
+    }
+
+    else{
+
+        barra.style.background = "#ef4444";
+
+    }
+
+}
+
+/*=========================================================
+    ATUALIZAR GRÁFICOS
+=========================================================*/
+
+function atualizarGraficos(){
+
+    destruirGraficos();
 
     criarGraficoStatus();
 
@@ -205,253 +893,73 @@ function criarGraficos() {
 
 }
 
-/*==================================================
-GRÁFICO STATUS
-==================================================*/
+/*=========================================================
+    DESTRUIR GRÁFICOS
+=========================================================*/
 
-function criarGraficoStatus() {
+function destruirGraficos(){
 
-    const canvas = document.getElementById("graficoStatus");
+    Object.values(state.charts).forEach(chart=>{
 
-    if (!canvas) return;
+        if(chart){
 
-    graficoStatus = new Chart(canvas, {
+            chart.destroy();
 
-        type: "doughnut",
+        }
 
-        data: {
+    });
 
-            labels: [
+    state.charts = {};
 
-                "Concluídas",
+}
+
+/*=========================================================
+    STATUS
+=========================================================*/
+
+function criarGraficoStatus(){
+
+    const ctx = state.elementos.graficoStatus;
+
+    if(!ctx) return;
+
+    const concluidas = state.atividades.filter(a=>a.status==="Concluído").length;
+
+    const andamento = state.atividades.filter(a=>a.status==="Em andamento").length;
+
+    const pendentes = state.atividades.filter(a=>a.status==="Pendente").length;
+
+    const atrasadas = state.atividades.filter(a=>a.status==="Atrasado").length;
+
+    state.charts.status = new Chart(ctx,{
+
+        type:"doughnut",
+
+        data:{
+
+            labels:[
+
+                "Concluído",
 
                 "Em andamento",
 
-                "Pendentes",
+                "Pendente",
 
-                "Atrasadas"
-
-            ],
-
-            datasets: [{
-
-                data: [14, 8, 2, 4],
-
-                backgroundColor: [
-
-                    "#2CBF6E",
-
-                    "#F5B400",
-
-                    "#8B97A8",
-
-                    "#E74C3C"
-
-                ],
-
-                borderWidth: 0
-
-            }]
-
-        },
-
-        options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            plugins: {
-
-                legend: {
-
-                    position: "bottom"
-
-                }
-
-            }
-
-        }
-
-    });
-
-}
-
-/*==================================================
-GRÁFICO COLABORADOR
-==================================================*/
-
-function criarGraficoColaborador() {
-
-    const canvas = document.getElementById("graficoColaborador");
-
-    if (!canvas) return;
-
-    graficoColaborador = new Chart(canvas, {
-
-        type: "bar",
-
-        data: {
-
-            labels: [
-
-                "Carlos",
-
-                "Marcos",
-
-                "Lucas",
-
-                "João",
-
-                "Ana"
+                "Atrasado"
 
             ],
 
-            datasets: [{
+            datasets:[{
 
-                label: "Atividades",
+                data:[
 
-                data: [8, 6, 5, 4, 5],
+                    concluidas,
 
-                backgroundColor: "#184E8C",
+                    andamento,
 
-                borderRadius: 8
+                    pendentes,
 
-            }]
-
-        },
-
-        options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false,
-
-            plugins: {
-
-                legend: {
-
-                    display: false
-
-                }
-
-            },
-
-            scales: {
-
-                y: {
-
-                    beginAtZero: true
-
-                }
-
-            }
-
-        }
-
-    });
-
-}
-
-/*==================================================
-ÁREAS
-==================================================*/
-
-function criarGraficoArea() {
-
-    const canvas = document.getElementById("graficoArea");
-
-    if (!canvas) return;
-
-    graficoArea = new Chart(canvas, {
-
-        type: "pie",
-
-        data: {
-
-            labels: [
-
-                "Armazém",
-
-                "Pátio",
-
-                "Recepção",
-
-                "Moega"
-
-            ],
-
-            datasets: [{
-
-                data: [10, 7, 6, 5],
-
-                backgroundColor: [
-
-                    "#0D2F5C",
-
-                    "#2CBF6E",
-
-                    "#F5B400",
-
-                    "#E74C3C"
-
-                ],
-
-                borderWidth: 0
-
-            }]
-
-        },
-
-        options: {
-
-            responsive: true,
-
-            maintainAspectRatio: false
-
-        }
-
-    });
-
-}
-
-/*==================================================
-CRITICIDADE
-==================================================*/
-
-function criarGraficoCriticidade() {
-
-    const canvas = document.getElementById("graficoCriticidade");
-
-    if (!canvas) return;
-
-    graficoCriticidade = new Chart(canvas, {
-
-        type: "polarArea",
-
-        data: {
-
-            labels: [
-
-                "Alta",
-
-                "Média",
-
-                "Baixa"
-
-            ],
-
-            datasets: [{
-
-                data: [5, 9, 14],
-
-                backgroundColor: [
-
-                    "#E74C3C",
-
-                    "#F5B400",
-
-                    "#2CBF6E"
+                    atrasadas
 
                 ]
 
@@ -459,21 +967,11 @@ function criarGraficoCriticidade() {
 
         },
 
-        options: {
+        options:{
 
-            responsive: true,
+            responsive:true,
 
-            maintainAspectRatio: false,
-
-            plugins: {
-
-                legend: {
-
-                    position: "bottom"
-
-                }
-
-            }
+            maintainAspectRatio:false
 
         }
 
@@ -481,764 +979,167 @@ function criarGraficoCriticidade() {
 
 }
 
-/*==================================================
-ATUALIZAR TODOS OS GRÁFICOS
-==================================================*/
+/*=========================================================
+    COLABORADOR
+=========================================================*/
 
-function atualizarGraficos(dados) {
+function criarGraficoColaborador(){
 
-    if (graficoStatus) {
+    const ctx = state.elementos.graficoColaborador;
 
-        graficoStatus.data.datasets[0].data = [
-            dados.concluidas,
-            dados.andamento,
-            dados.pendentes,
-            dados.atrasadas
-        ];
+    if(!ctx) return;
 
-        graficoStatus.update();
+    const dados = {};
 
-    }
+    state.atividades.forEach(a=>{
 
-}
+        dados[a.colaborador] =
 
-/*==================================================
-BANCO DE DADOS TEMPORÁRIO
-==================================================*/
-
-let atividades = [
-
-    {
-        id: 1,
-        local: "Armazém 01",
-        area: "Recebimento",
-        atividade: "Limpeza Geral",
-        encarregado: "Rayan Cardoso",
-        colaborador: "Carlos Silva",
-        prioridade: "Alta",
-        status: "Em andamento",
-        inicio: "07:30",
-        prazo: "11:00",
-        progresso: 60
-    },
-
-    {
-        id: 2,
-        local: "Pátio",
-        area: "Expedição",
-        atividade: "Organização",
-        encarregado: "Rayan Cardoso",
-        colaborador: "Marcos Andrade",
-        prioridade: "Média",
-        status: "Concluído",
-        inicio: "08:00",
-        prazo: "10:30",
-        progresso: 100
-    }
-
-];
-
-/*==================================================
-INICIALIZA TABELA
-==================================================*/
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    carregarTabela();
-
-});
-
-/*==================================================
-CARREGAR TABELA
-==================================================*/
-
-function carregarTabela() {
-
-    const tbody = document.querySelector("tbody");
-
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    atividades.forEach(item => {
-
-        tbody.innerHTML += `
-
-        <tr>
-
-            <td>${item.id}</td>
-
-            <td>${item.local}</td>
-
-            <td>${item.area}</td>
-
-            <td>${item.atividade}</td>
-
-            <td>${item.encarregado}</td>
-
-            <td>${item.colaborador}</td>
-
-            <td>
-
-                <span class="prioridade ${item.prioridade.toLowerCase()}">
-
-                    ${item.prioridade}
-
-                </span>
-
-            </td>
-
-            <td>
-
-                <span class="status ${converterStatus(item.status)}">
-
-                    ${item.status}
-
-                </span>
-
-            </td>
-
-            <td>${item.inicio}</td>
-
-            <td>${item.prazo}</td>
-
-            <td>
-
-                <div class="mini-barra">
-
-                    <div class="mini-progresso"
-
-                    style="width:${item.progresso}%">
-
-                    </div>
-
-                </div>
-
-                ${item.progresso}%
-
-            </td>
-
-            <td>
-
-                <button
-                class="acao visualizar"
-                onclick="visualizar(${item.id})">
-
-                <i class="fa-solid fa-eye"></i>
-
-                </button>
-
-                <button
-                class="acao editar"
-                onclick="editar(${item.id})">
-
-                <i class="fa-solid fa-pen"></i>
-
-                </button>
-
-            </td>
-
-        </tr>
-
-        `;
+            (dados[a.colaborador] || 0) + 1;
 
     });
 
-}
+    state.charts.colaborador = new Chart(ctx,{
 
-/*==================================================
-STATUS
-==================================================*/
+        type:"bar",
 
-function converterStatus(status) {
+        data:{
 
-    switch (status) {
+            labels:Object.keys(dados),
 
-        case "Concluído":
-            return "concluido";
+            datasets:[{
 
-        case "Em andamento":
-            return "andamento";
+                label:"Atividades",
 
-        case "Pendente":
-            return "pendente";
+                data:Object.values(dados)
 
-        case "Atrasado":
-            return "atrasado";
+            }]
 
-        default:
-            return "";
+        },
 
-    }
+        options:{
 
-}
+            responsive:true,
 
-/*==================================================
-VISUALIZAR
-==================================================*/
-
-function visualizar(id) {
-
-    const atividade = atividades.find(a => a.id === id);
-
-    if (!atividade) return;
-
-    alert(
-
-        `ATIVIDADE
-
-Local: ${atividade.local}
-
-Área: ${atividade.area}
-
-Encarregado: ${atividade.encarregado}
-
-Colaborador: ${atividade.colaborador}
-
-Status: ${atividade.status}
-
-Progresso: ${atividade.progresso}%`
-
-    );
-
-}
-
-/*==================================================
-EDITAR
-==================================================*/
-
-function editar(id) {
-
-    alert("Tela de edição será criada na próxima etapa.");
-
-}
-
-/*==================================================
-ADICIONAR NOVA ATIVIDADE
-==================================================*/
-
-function adicionarAtividade(objeto) {
-
-    atividades.push(objeto);
-
-    carregarTabela();
-
-    atualizarKPIsAutomatico();
-
-}
-
-/*==================================================
-EXCLUIR
-==================================================*/
-
-function excluirAtividade(id) {
-
-    atividades = atividades.filter(item => item.id !== id);
-
-    carregarTabela();
-
-    atualizarKPIsAutomatico();
-
-}
-
-/*==================================================
-KPIs AUTOMÁTICOS
-==================================================*/
-
-function atualizarKPIsAutomatico() {
-
-    const total = atividades.length;
-
-    const concluidas = atividades.filter(a =>
-        a.status === "Concluído").length;
-
-    const andamento = atividades.filter(a =>
-        a.status === "Em andamento").length;
-
-    const pendentes = atividades.filter(a =>
-        a.status === "Pendente").length;
-
-    const atrasadas = atividades.filter(a =>
-        a.status === "Atrasado").length;
-
-    const percentual = total === 0
-        ? 0
-        : Math.round((concluidas / total) * 100);
-
-    atualizarCard(".azul h2", total);
-    atualizarCard(".verde h2", concluidas);
-    atualizarCard(".amarelo h2", andamento);
-    atualizarCard(".cinza h2", pendentes);
-    atualizarCard(".vermelho h2", atrasadas);
-
-    const circle = document.querySelector(".grafico-circle span");
-
-    if (circle) {
-
-        circle.innerHTML = percentual + "%";
-
-    }
-
-    atualizarGraficos({
-
-        concluidas,
-        andamento,
-        pendentes,
-        atrasadas
-
-    });
-
-}
-
-/*==================================================
-ANIMAÇÃO DOS KPIs
-==================================================*/
-
-function atualizarCard(seletor, valor) {
-
-    const elemento = document.querySelector(seletor);
-
-    if (!elemento) return;
-
-    animarNumero(elemento, valor);
-
-}
-
-/*==================================================
-ANIMAÇÃO DOS NÚMEROS
-==================================================*/
-
-function animarNumero(elemento, destino) {
-
-    let numero = 0;
-
-    clearInterval(elemento.timer);
-
-    elemento.timer = setInterval(() => {
-
-        numero++;
-
-        elemento.innerHTML = numero;
-
-        if (numero >= destino) {
-
-            elemento.innerHTML = destino;
-
-            clearInterval(elemento.timer);
+            maintainAspectRatio:false
 
         }
 
-    }, 25);
+    });
 
 }
 
-/*==================================================
-ATUALIZAÇÃO GERAL
-==================================================*/
+/*=========================================================
+    ÁREA
+=========================================================*/
 
-function atualizarSistema() {
+function criarGraficoArea(){
 
-    carregarTabela();
+    const ctx = state.elementos.graficoArea;
 
-    atualizarKPIsAutomatico();
+    if(!ctx) return;
 
-}
+    const dados = {};
 
-/*==================================================
-EXEMPLO DE CADASTRO
-==================================================*/
+    state.atividades.forEach(a=>{
 
-function cadastrarExemplo() {
+        dados[a.area] =
 
-    atividades.push({
-
-        id: gerarID(),
-
-        local: "Moega",
-
-        area: "Descarga",
-
-        atividade: "Lavagem do Piso",
-
-        encarregado: "Rayan Cardoso",
-
-        colaborador: "Pedro Alves",
-
-        prioridade: "Alta",
-
-        status: "Pendente",
-
-        inicio: "09:15",
-
-        prazo: "13:00",
-
-        progresso: 0
+            (dados[a.area] || 0) + 1;
 
     });
 
-    atualizarSistema();
+    state.charts.area = new Chart(ctx,{
 
-}
+        type:"bar",
 
-/*==================================================
-SIMULAÇÃO
-==================================================*/
+        data:{
 
-// Para testar rapidamente, execute no console:
-//
-// cadastrarExemplo();
+            labels:Object.keys(dados),
 
-/*==================================================
-FIREBASE
-HOUSEKEEPING TOEX
-==================================================*/
+            datasets:[{
 
-/*
-=============================================
-IMPORTANTE
+                label:"Atividades",
 
-Quando criar seu projeto no Firebase,
-substitua as informações abaixo pelas
-credenciais do seu projeto.
+                data:Object.values(dados)
 
-=============================================
-*/
+            }]
 
-const firebaseConfig = {
+        },
 
-    apiKey: "SUA_API_KEY",
+        options:{
 
-    authDomain: "SEU_PROJETO.firebaseapp.com",
+            responsive:true,
 
-    projectId: "SEU_PROJETO",
+            maintainAspectRatio:false
 
-    storageBucket: "SEU_PROJETO.appspot.com",
-
-    messagingSenderId: "000000000",
-
-    appId: "000000000"
-
-};
-
-/*==================================================
-VERIFICA FIREBASE
-==================================================*/
-
-let firebaseAtivo = false;
-
-try {
-
-    if (typeof firebase !== "undefined") {
-
-        firebase.initializeApp(firebaseConfig);
-
-        firebaseAtivo = true;
-
-        console.log("Firebase conectado.");
-
-    }
-
-} catch (e) {
-
-    console.log("Firebase ainda não configurado.");
-
-}
-
-/*==================================================
-REFERÊNCIA FIRESTORE
-==================================================*/
-
-let db = null;
-
-if (firebaseAtivo) {
-
-    db = firebase.firestore();
-
-}
-
-/*==================================================
-SALVAR ATIVIDADE
-==================================================*/
-
-async function salvarFirebase(atividade) {
-
-    if (!firebaseAtivo) return;
-
-    try {
-
-        await db.collection("atividades").add(atividade);
-
-        console.log("Atividade salva.");
-
-    }
-
-    catch (erro) {
-
-        console.error(erro);
-
-    }
-
-}
-
-/*==================================================
-CARREGAR
-==================================================*/
-
-async function carregarFirebase() {
-
-    if (!firebaseAtivo) {
-
-        atualizarSistema();
-
-        return;
-
-    }
-
-    atividades = [];
-
-    const snapshot = await db.collection("atividades").get();
-
-    snapshot.forEach(doc => {
-
-        atividades.push({
-
-            id: doc.id,
-
-            ...doc.data()
-
-        });
-
-    });
-
-    atualizarSistema();
-
-}
-
-/*==================================================
-ATUALIZAÇÃO EM TEMPO REAL
-==================================================*/
-
-function realtimeFirebase() {
-
-    if (!firebaseAtivo) return;
-
-    db.collection("atividades")
-
-        .onSnapshot(snapshot => {
-
-            atividades = [];
-
-            snapshot.forEach(doc => {
-
-                atividades.push({
-
-                    id: doc.id,
-
-                    ...doc.data()
-
-                });
-
-            });
-
-            atualizarSistema();
-
-        });
-
-}
-
-/*==================================================
-EXCLUIR
-==================================================*/
-
-async function excluirFirebase(id) {
-
-    if (!firebaseAtivo) {
-
-        excluirAtividade(id);
-
-        return;
-
-    }
-
-    await db.collection("atividades")
-
-        .doc(id)
-
-        .delete();
-
-}
-
-/*==================================================
-NOVA ATIVIDADE
-==================================================*/
-
-async function novaAtividadeFirebase(objeto) {
-
-    if (firebaseAtivo) {
-
-        await salvarFirebase(objeto);
-
-    }
-
-    else {
-
-        adicionarAtividade(objeto);
-
-    }
-
-}
-
-/*==================================================
-INICIALIZAÇÃO
-==================================================*/
-
-window.addEventListener("load", () => {
-
-    if (firebaseAtivo) {
-
-        realtimeFirebase();
-
-    }
-
-    else {
-
-        atualizarSistema();
-
-    }
-
-});
-
-/*==================================================
-FIM DO SCRIPT
-==================================================*/
-
-console.log(
-    "%cHOUSEKEEPING TERMINAL TOEX",
-    "font-size:22px;color:#0D2F5C;font-weight:bold;"
-);
-
-console.log(
-    "%cSistema carregado com sucesso.",
-    "color:#2CBF6E;"
-);
-
-/*==================================================
-EXPORTAR PDF
-==================================================*/
-
-async function exportarPDF() {
-
-    const { jsPDF } = window.jspdf;
-
-    const doc = new jsPDF("landscape");
-
-    // Cabeçalho
-    doc.setFontSize(20);
-    doc.setTextColor(13, 47, 92);
-    doc.text("HOUSEKEEPING - TERMINAL TOEX", 14, 18);
-
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-
-    doc.text(
-        "Relatório de Atividades",
-        14,
-        26
-    );
-
-    // Dados da tabela
-    let linhas = [];
-
-    atividades.forEach(item => {
-
-        linhas.push([
-
-            item.id,
-            item.local,
-            item.area,
-            item.atividade,
-            item.encarregado,
-            item.colaborador,
-            item.status,
-            item.progresso + "%"
-
-        ]);
-
-    });
-
-    doc.autoTable({
-
-        startY: 35,
-
-        head: [[
-            "ID",
-
-            "Local",
-
-            "Área",
-
-            "Atividade",
-
-            "Encarregado",
-
-            "Colaborador",
-
-            "Status",
-
-            "%"
-        ]],
-
-        body: linhas,
-
-        theme: "grid"
-
-    });
-
-    const hoje = new Date();
-
-    const arquivo = `Housekeeping_${hoje.getDate()}-${hoje.getMonth() + 1}-${hoje.getFullYear()}.pdf`;
-
-    doc.save(arquivo);
-
-}
-
-/*==================================================
-MODAL NOVA ATIVIDADE
-==================================================*/
-
-const modal = document.getElementById("modalNovaAtividade");
-
-const btnNova = document.querySelector(".btn-nova");
-
-const btnFechar = document.getElementById("fecharModal");
-
-const btnCancelar = document.getElementById("cancelarModal");
-
-if(btnNova){
-
-    btnNova.addEventListener("click",()=>{
-
-        modal.classList.add("active");
+        }
 
     });
 
 }
 
-if(btnFechar){
+/*=========================================================
+    CRITICIDADE
+=========================================================*/
 
-    btnFechar.addEventListener("click",()=>{
+function criarGraficoCriticidade(){
 
-        modal.classList.remove("active");
+    const ctx = state.elementos.graficoCriticidade;
 
-    });
+    if(!ctx) return;
 
-}
+    const baixa = state.atividades.filter(a=>a.prioridade==="Baixa").length;
 
-if(btnCancelar){
+    const media = state.atividades.filter(a=>a.prioridade==="Média").length;
 
-    btnCancelar.addEventListener("click",()=>{
+    const alta = state.atividades.filter(a=>a.prioridade==="Alta").length;
 
-        modal.classList.remove("active");
+    const critica = state.atividades.filter(a=>a.prioridade==="Crítica").length;
+
+    state.charts.criticidade = new Chart(ctx,{
+
+        type:"polarArea",
+
+        data:{
+
+            labels:[
+
+                "Baixa",
+
+                "Média",
+
+                "Alta",
+
+                "Crítica"
+
+            ],
+
+            datasets:[{
+
+                data:[
+
+                    baixa,
+
+                    media,
+
+                    alta,
+
+                    critica
+
+                ]
+
+            }]
+
+        },
+
+        options:{
+
+            responsive:true,
+
+            maintainAspectRatio:false
+
+        }
 
     });
 

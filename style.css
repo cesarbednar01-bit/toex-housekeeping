@@ -1543,3 +1543,317 @@ MODAL NOVA ATIVIDADE
     display:flex;
 
 }
+
+/*==================================================
+MODAL HOUSEKEEPING
+==================================================*/
+
+.modal{
+
+    width:95%;
+
+    max-width:900px;
+
+    max-height:90vh;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    display:flex;
+
+    flex-direction:column;
+
+    box-shadow:0 30px 80px rgba(0,0,0,.35);
+
+    animation:modalShow .25s ease;
+
+}
+
+.modal-header{
+
+    background:linear-gradient(90deg,var(--azul),var(--azul-claro));
+
+    color:#fff;
+
+    padding:22px 28px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.modal-header h2{
+
+    font-size:30px;
+
+    font-weight:700;
+
+}
+
+.modal-header span{
+
+    opacity:.85;
+
+    font-size:14px;
+
+}
+
+.btn-fechar{
+
+    width:42px;
+
+    height:42px;
+
+    border:none;
+
+    border-radius:10px;
+
+    background:rgba(255,255,255,.15);
+
+    color:#fff;
+
+    cursor:pointer;
+
+    font-size:18px;
+
+    transition:.3s;
+
+}
+
+.btn-fechar:hover{
+
+    background:#E74C3C;
+
+}
+
+.modal-body{
+
+    padding:28px;
+
+    overflow-y:auto;
+
+}
+
+.grupo{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:20px;
+
+    margin-bottom:18px;
+
+}
+
+.campo{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.campo label{
+
+    font-size:14px;
+
+    font-weight:700;
+
+    margin-bottom:8px;
+
+    color:#233142;
+
+}
+
+.campo input,
+
+.campo select,
+
+.campo textarea{
+
+    width:100%;
+
+    border:1px solid #d8e2ec;
+
+    border-radius:10px;
+
+    padding:12px 14px;
+
+    font-size:14px;
+
+    font-family:inherit;
+
+    background:#fff;
+
+}
+
+.campo textarea{
+
+    resize:vertical;
+
+    min-height:130px;
+
+}
+
+.modal-footer{
+
+    background:#f8fafc;
+
+    padding:20px 28px;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:15px;
+
+    border-top:1px solid #e6edf5;
+
+}
+
+.btn-cancelar{
+
+    background:#9CA3AF;
+
+    color:#fff;
+
+    border:none;
+
+    padding:12px 22px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+
+.btn-cancelar:hover{
+
+    background:#6B7280;
+
+}
+
+.btn-salvar{
+
+    background:#16A34A;
+
+    color:#fff;
+
+    border:none;
+
+    padding:12px 24px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-weight:700;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+.btn-salvar:hover{
+
+    background:#15803D;
+
+}
+
+.sem-registros{
+
+    text-align:center;
+
+    padding:40px;
+
+    color:#6B7280;
+
+    font-weight:600;
+
+}
+
+.btn-acao{
+
+    width:38px;
+
+    height:38px;
+
+    border:none;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    color:#fff;
+
+    margin-right:6px;
+
+}
+
+.btn-acao.editar{
+
+    background:#F59E0B;
+
+}
+
+.btn-acao.excluir{
+
+    background:#DC2626;
+
+}
+
+.btn-acao:hover{
+
+    transform:scale(1.08);
+
+}
+
+@keyframes modalShow{
+
+    from{
+
+        opacity:0;
+
+        transform:translateY(-20px) scale(.97);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateY(0) scale(1);
+
+    }
+
+}
+
+@media(max-width:900px){
+
+    .grupo{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .modal{
+
+        width:98%;
+
+        max-height:95vh;
+
+    }
+
+}
