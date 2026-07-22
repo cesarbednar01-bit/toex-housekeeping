@@ -1829,6 +1829,15 @@ MODAL HOUSEKEEPING
 
 }
 
+.btn-acao.duplicar{
+    background:#2563EB;
+}
+
+.btn-acao.duplicar:hover{
+    background:#1D4ED8;
+}
+
+
 @keyframes modalShow {
 
     from {

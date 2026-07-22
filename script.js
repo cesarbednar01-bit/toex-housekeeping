@@ -617,23 +617,34 @@ function renderizarTabela() {
 
             <td>
 
-                <button
-                    class="btn-acao editar"
-                    onclick="editarAtividade(${atividade.id})">
+    <button
+        class="btn-acao duplicar"
+        onclick="duplicarAtividade(${atividade.id})"
+        title="Duplicar">
 
-                    <i class="fa-solid fa-pen"></i>
+        <i class="fa-solid fa-copy"></i>
 
-                </button>
+    </button>
 
-                <button
-                    class="btn-acao excluir"
-                    onclick="excluirAtividade(${atividade.id})">
+    <button
+        class="btn-acao editar"
+        onclick="editarAtividade(${atividade.id})"
+        title="Editar">
 
-                    <i class="fa-solid fa-trash"></i>
+        <i class="fa-solid fa-pen"></i>
 
-                </button>
+    </button>
 
-            </td>
+    <button
+        class="btn-acao excluir"
+        onclick="excluirAtividade(${atividade.id})"
+        title="Excluir">
+
+        <i class="fa-solid fa-trash"></i>
+
+    </button>
+
+</td>
 
         `;
 
@@ -721,10 +732,44 @@ function editarAtividade(id) {
 
     abrirModal(false);
 
-   }
+}
 
-   /*=========================================================
-    MODAL
+/*=========================================================
+    DUPLICAR ATIVIDADE
+=========================================================*/
+
+function duplicarAtividade(id) {
+
+    const atividade = state.atividades.find(
+        item => item.id === id
+    );
+
+    if (!atividade) return;
+
+    const el = state.elementos;
+
+    // Não estamos editando, vamos criar uma nova
+    state.atividadeEditando = null;
+
+    el.local.value = atividade.local;
+    el.area.value = atividade.area;
+    el.atividade.value = atividade.atividade;
+    el.encarregado.value = atividade.encarregado;
+    el.colaborador.value = atividade.colaborador;
+    el.prioridade.value = atividade.prioridade;
+    el.status.value = atividade.status;
+    el.inicio.value = atividade.inicio;
+    el.prazo.value = atividade.prazo;
+    el.progresso.value = atividade.progresso;
+    el.observacao.value = atividade.observacao;
+
+    state.elementos.modal.classList.add("active");
+
+}
+
+
+/*=========================================================
+ MODAL
 =========================================================*/
 
 function abrirModal(limpar = true) {
@@ -845,11 +890,11 @@ function atualizarKPIs() {
     ATUALIZAR CARD
 =========================================================*/
 
-function atualizarCard(id, valor){
+function atualizarCard(id, valor) {
 
     const elemento = document.getElementById(id);
 
-    if(!elemento) return;
+    if (!elemento) return;
 
     elemento.textContent = valor;
 
@@ -859,27 +904,27 @@ function atualizarCard(id, valor){
     BARRA DE EFETIVIDADE
 =========================================================*/
 
-function atualizarBarraEfetividade(percentual){
+function atualizarBarraEfetividade(percentual) {
 
     const barra = document.getElementById("barraEfetividade");
 
-    if(!barra) return;
+    if (!barra) return;
 
     barra.style.width = percentual + "%";
 
-    if(percentual >= 90){
+    if (percentual >= 90) {
 
         barra.style.background = "#22c55e";
 
     }
 
-    else if(percentual >= 70){
+    else if (percentual >= 70) {
 
         barra.style.background = "#f59e0b";
 
     }
 
-    else{
+    else {
 
         barra.style.background = "#ef4444";
 
@@ -891,7 +936,7 @@ function atualizarBarraEfetividade(percentual){
     ATUALIZAR GRÁFICOS
 =========================================================*/
 
-function atualizarGraficos(){
+function atualizarGraficos() {
 
     destruirGraficos();
 
@@ -909,11 +954,11 @@ function atualizarGraficos(){
     DESTRUIR GRÁFICOS
 =========================================================*/
 
-function destruirGraficos(){
+function destruirGraficos() {
 
-    Object.values(state.charts).forEach(chart=>{
+    Object.values(state.charts).forEach(chart => {
 
-        if(chart){
+        if (chart) {
 
             chart.destroy();
 
@@ -929,27 +974,27 @@ function destruirGraficos(){
     STATUS
 =========================================================*/
 
-function criarGraficoStatus(){
+function criarGraficoStatus() {
 
     const ctx = state.elementos.graficoStatus;
 
-    if(!ctx) return;
+    if (!ctx) return;
 
-    const concluidas = state.atividades.filter(a=>a.status==="Concluído").length;
+    const concluidas = state.atividades.filter(a => a.status === "Concluído").length;
 
-    const andamento = state.atividades.filter(a=>a.status==="Em andamento").length;
+    const andamento = state.atividades.filter(a => a.status === "Em andamento").length;
 
-    const pendentes = state.atividades.filter(a=>a.status==="Pendente").length;
+    const pendentes = state.atividades.filter(a => a.status === "Pendente").length;
 
-    const atrasadas = state.atividades.filter(a=>a.status==="Atrasado").length;
+    const atrasadas = state.atividades.filter(a => a.status === "Atrasado").length;
 
-    state.charts.status = new Chart(ctx,{
+    state.charts.status = new Chart(ctx, {
 
-        type:"doughnut",
+        type: "doughnut",
 
-        data:{
+        data: {
 
-            labels:[
+            labels: [
 
                 "Concluído",
 
@@ -961,9 +1006,9 @@ function criarGraficoStatus(){
 
             ],
 
-            datasets:[{
+            datasets: [{
 
-                data:[
+                data: [
 
                     concluidas,
 
@@ -979,11 +1024,11 @@ function criarGraficoStatus(){
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false
+            maintainAspectRatio: false
 
         }
 
@@ -995,15 +1040,15 @@ function criarGraficoStatus(){
     COLABORADOR
 =========================================================*/
 
-function criarGraficoColaborador(){
+function criarGraficoColaborador() {
 
     const ctx = state.elementos.graficoColaborador;
 
-    if(!ctx) return;
+    if (!ctx) return;
 
     const dados = {};
 
-    state.atividades.forEach(a=>{
+    state.atividades.forEach(a => {
 
         dados[a.colaborador] =
 
@@ -1011,29 +1056,29 @@ function criarGraficoColaborador(){
 
     });
 
-    state.charts.colaborador = new Chart(ctx,{
+    state.charts.colaborador = new Chart(ctx, {
 
-        type:"bar",
+        type: "bar",
 
-        data:{
+        data: {
 
-            labels:Object.keys(dados),
+            labels: Object.keys(dados),
 
-            datasets:[{
+            datasets: [{
 
-                label:"Atividades",
+                label: "Atividades",
 
-                data:Object.values(dados)
+                data: Object.values(dados)
 
             }]
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false
+            maintainAspectRatio: false
 
         }
 
@@ -1045,15 +1090,15 @@ function criarGraficoColaborador(){
     ÁREA
 =========================================================*/
 
-function criarGraficoArea(){
+function criarGraficoArea() {
 
     const ctx = state.elementos.graficoArea;
 
-    if(!ctx) return;
+    if (!ctx) return;
 
     const dados = {};
 
-    state.atividades.forEach(a=>{
+    state.atividades.forEach(a => {
 
         dados[a.area] =
 
@@ -1061,29 +1106,29 @@ function criarGraficoArea(){
 
     });
 
-    state.charts.area = new Chart(ctx,{
+    state.charts.area = new Chart(ctx, {
 
-        type:"bar",
+        type: "bar",
 
-        data:{
+        data: {
 
-            labels:Object.keys(dados),
+            labels: Object.keys(dados),
 
-            datasets:[{
+            datasets: [{
 
-                label:"Atividades",
+                label: "Atividades",
 
-                data:Object.values(dados)
+                data: Object.values(dados)
 
             }]
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false
+            maintainAspectRatio: false
 
         }
 
@@ -1095,27 +1140,27 @@ function criarGraficoArea(){
     CRITICIDADE
 =========================================================*/
 
-function criarGraficoCriticidade(){
+function criarGraficoCriticidade() {
 
     const ctx = state.elementos.graficoCriticidade;
 
-    if(!ctx) return;
+    if (!ctx) return;
 
-    const baixa = state.atividades.filter(a=>a.prioridade==="Baixa").length;
+    const baixa = state.atividades.filter(a => a.prioridade === "Baixa").length;
 
-    const media = state.atividades.filter(a=>a.prioridade==="Média").length;
+    const media = state.atividades.filter(a => a.prioridade === "Média").length;
 
-    const alta = state.atividades.filter(a=>a.prioridade==="Alta").length;
+    const alta = state.atividades.filter(a => a.prioridade === "Alta").length;
 
-    const critica = state.atividades.filter(a=>a.prioridade==="Crítica").length;
+    const critica = state.atividades.filter(a => a.prioridade === "Crítica").length;
 
-    state.charts.criticidade = new Chart(ctx,{
+    state.charts.criticidade = new Chart(ctx, {
 
-        type:"polarArea",
+        type: "polarArea",
 
-        data:{
+        data: {
 
-            labels:[
+            labels: [
 
                 "Baixa",
 
@@ -1127,9 +1172,9 @@ function criarGraficoCriticidade(){
 
             ],
 
-            datasets:[{
+            datasets: [{
 
-                data:[
+                data: [
 
                     baixa,
 
@@ -1145,11 +1190,11 @@ function criarGraficoCriticidade(){
 
         },
 
-        options:{
+        options: {
 
-            responsive:true,
+            responsive: true,
 
-            maintainAspectRatio:false
+            maintainAspectRatio: false
 
         }
 
@@ -1185,3 +1230,48 @@ atualizarDataHora();
 
 // Atualiza a cada segundo
 setInterval(atualizarDataHora, 1000);
+
+/*=========================================================
+    LOGOUT
+=========================================================*/
+
+function logout() {
+
+    const confirmar = confirm("Deseja realmente sair do sistema?");
+
+    if (!confirmar) return;
+
+    sessionStorage.removeItem("usuarioLogado");
+
+    window.location.href = "login.html";
+
+}
+
+/*=========================================================
+    FILTRO POR PERÍODO
+=========================================================*/
+
+function filtrarPeriodo() {
+
+    const dataInicio = document.getElementById("dataInicio").value;
+    const dataFim = document.getElementById("dataFim").value;
+
+    if (!dataInicio || !dataFim) {
+        alert("Selecione a data inicial e a data final.");
+        return;
+    }
+
+    const atividadesFiltradas = state.atividades.filter(atividade => {
+
+        if (!atividade.inicio) return false;
+
+        return (
+            atividade.inicio >= dataInicio &&
+            atividade.inicio <= dataFim
+        );
+
+    });
+
+    renderizarTabelaFiltrada(atividadesFiltradas);
+
+}
