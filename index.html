@@ -48,27 +48,30 @@
 
             <div class="informacoes">
 
-                <div class="info">
+                <div class="lado-esquerdo">
 
-                    <i class="fa-regular fa-calendar-days"></i>
-
-                    <div>
-
-                        <small>ATUALIZAÇÃO:</small>
-
-                        <strong id="dataHora">
-                            --
-                        </strong>
-
+                    <div class="info">
+                        <strong id="dataHora"></strong>
                     </div>
+
+                    <button class="btn-sair" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                        Sair
+                    </button>
 
                 </div>
 
-                <div class="periodo">
+                <div class="lado-direito">
 
-                    <small>PERÍODO</small>
+                    <h5>Período:</h5>
 
-                    <input type="text" id="periodo" value="">
+                    <input type="date" id="dataInicio">
+
+                    <input type="date" id="dataFim">
+
+                    <button class="btn-aplicar" onclick="filtrarPeriodo()">
+                        Aplicar
+                    </button>
 
                 </div>
 

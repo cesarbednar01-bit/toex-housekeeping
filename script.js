@@ -1156,3 +1156,32 @@ function criarGraficoCriticidade(){
     });
 
 }
+
+// ================================
+// DATA E HORA EM TEMPO REAL
+// ================================
+
+function atualizarDataHora() {
+
+    const agora = new Date();
+
+    const data = agora.toLocaleDateString("pt-BR");
+
+    const hora = agora.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+    });
+
+    const elemento = document.getElementById("dataHora");
+
+    if (elemento) {
+        elemento.innerHTML = `${data}<br>${hora}`;
+    }
+}
+
+// Atualiza imediatamente
+atualizarDataHora();
+
+// Atualiza a cada segundo
+setInterval(atualizarDataHora, 1000);
