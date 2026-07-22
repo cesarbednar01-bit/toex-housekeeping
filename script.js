@@ -53,6 +53,17 @@ const state = {
 
 };
 
+// ======================================
+// VERIFICA SE O USUÁRIO ESTÁ LOGADO
+// ======================================
+
+const usuarioLogado = sessionStorage.getItem("usuarioLogado");
+
+if (!usuarioLogado) {
+
+    window.location.replace("login.html");
+
+}
 
 
 /*=========================================================
@@ -376,7 +387,8 @@ function limparFormulario() {
 
     el.atividade.value = "";
 
-    el.encarregado.value = "";
+    // Encarregado fixo
+    el.encarregado.value = "Rayan Cardoso";
 
     el.colaborador.value = "";
 
