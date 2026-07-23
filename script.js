@@ -122,7 +122,7 @@ function cacheDOM() {
 
         foto: document.getElementById("foto"),
 
-        observacao: document.getElementById("observacao"),
+        
 
 
         // TABELA
@@ -403,7 +403,7 @@ function limparFormulario() {
 
     el.foto.value = "";
 
-    el.observacao.value = "";
+    
 
 }
 
@@ -516,7 +516,7 @@ function salvarNovaAtividade() {
 
         progresso: Number(el.progresso.value),
 
-        observacao: el.observacao.value,
+        
 
         foto: null
 
@@ -717,7 +717,7 @@ function editarAtividade(id) {
 
     el.progresso.value = atividade.progresso;
 
-    el.observacao.value = atividade.observacao;
+    
 
     abrirModal(false);
 
@@ -750,7 +750,7 @@ function duplicarAtividade(id) {
     el.inicio.value = atividade.inicio;
     el.prazo.value = atividade.prazo;
     el.progresso.value = atividade.progresso;
-    el.observacao.value = atividade.observacao;
+    
 
     state.elementos.modal.classList.add("active");
 
