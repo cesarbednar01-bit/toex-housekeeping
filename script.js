@@ -566,7 +566,7 @@ function renderizarTabela() {
 
         tbody.innerHTML = `
             <tr>
-                <td colspan="12" class="sem-registros">
+                <td colspan="11" class="sem-registros">
                     Nenhuma atividade cadastrada.
                 </td>
             </tr>
@@ -1245,12 +1245,20 @@ function filtrarPeriodo() {
     const dataInicio = document.getElementById("dataInicio").value;
     const dataFim = document.getElementById("dataFim").value;
 
+    // Verifica se as datas foram informadas
     if (!dataInicio || !dataFim) {
         alert("Selecione a data inicial e a data final.");
         return;
     }
 
-    const atividadesFiltradas = state.atividades.filter(atividade => {
+    // Verifica se o período é válido
+    if (dataInicio > dataFim) {
+        alert("A data inicial não pode ser maior que a data final.");
+        return;
+    }
+
+    // Filtra as atividades
+    const atividadesFiltradas = state.atividades.filter((atividade) => {
 
         if (!atividade.inicio) return false;
 
@@ -1261,6 +1269,86 @@ function filtrarPeriodo() {
 
     });
 
+    // Renderiza a tabela filtrada
     renderizarTabelaFiltrada(atividadesFiltradas);
+
+}
+
+/*=========================================================
+    RENDERIZAR TABELA FILTRADA
+=========================================================*/
+
+function renderizarTabelaFiltrada(lista) {
+
+    const tbody = state.elementos.tabela;
+
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    if (lista.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="11" class="sem-registros">
+                    Nenhuma atividade encontrada para o período informado.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    lista.forEach((atividade) => {
+
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${atividade.id}</td>
+            <td>${atividade.area}</td>
+            <td>${atividade.atividade}</td>
+            <td>${atividade.encarregado}</td>
+            <td>${atividade.colaborador}</td>
+
+            <td>
+                ${criarBadgePrioridade(atividade.prioridade)}
+            </td>
+
+            <td>
+                ${criarBadgeStatus(atividade.status)}
+            </td>
+
+            <td>${formatarData(atividade.inicio)}</td>
+
+            <td>${formatarData(atividade.prazo)}</td>
+
+            <td>${atividade.progresso}%</td>
+
+            <td>
+
+                <button
+                    class="btn-acao duplicar"
+                    onclick="duplicarAtividade(${atividade.id})">
+                    <i class="fa-solid fa-copy"></i>
+                </button>
+
+                <button
+                    class="btn-acao editar"
+                    onclick="editarAtividade(${atividade.id})">
+                    <i class="fa-solid fa-pen"></i>
+                </button>
+
+                <button
+                    class="btn-acao excluir"
+                    onclick="excluirAtividade(${atividade.id})">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+
+    });
 
 }
