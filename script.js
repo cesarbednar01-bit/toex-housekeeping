@@ -1135,45 +1135,52 @@ function criarGraficoCriticidade() {
 
     if (!ctx) return;
 
-    const baixa = state.atividades.filter(a => a.prioridade === "Baixa").length;
+    const colaboradores = {};
 
-    const media = state.atividades.filter(a => a.prioridade === "Média").length;
+    state.atividades.forEach((atividade) => {
 
-    const alta = state.atividades.filter(a => a.prioridade === "Alta").length;
+        if (!colaboradores[atividade.colaborador]) {
 
-    const critica = state.atividades.filter(a => a.prioridade === "Crítica").length;
+            colaboradores[atividade.colaborador] = {
+                total: 0,
+                progresso: 0
+            };
+
+        }
+
+        colaboradores[atividade.colaborador].total++;
+
+        colaboradores[atividade.colaborador].progresso += Number(atividade.progresso);
+
+    });
+
+    const ranking = Object.entries(colaboradores).map(([nome, dados]) => ({
+
+        nome,
+
+        efetividade: dados.total === 0
+            ? 0
+            : Math.round(dados.progresso / dados.total)
+
+    }));
+
+    ranking.sort((a, b) => b.efetividade - a.efetividade);
 
     state.charts.criticidade = new Chart(ctx, {
 
-        type: "polarArea",
+        type: "bar",
 
         data: {
 
-            labels: [
-
-                "Baixa",
-
-                "Média",
-
-                "Alta",
-
-                "Crítica"
-
-            ],
+            labels: ranking.map(item => item.nome),
 
             datasets: [{
 
-                data: [
+                label: "Efetividade (%)",
 
-                    baixa,
+                data: ranking.map(item => item.efetividade),
 
-                    media,
-
-                    alta,
-
-                    critica
-
-                ]
+                borderWidth: 1
 
             }]
 
@@ -1181,15 +1188,65 @@ function criarGraficoCriticidade() {
 
         options: {
 
-            responsive: true,
+    indexAxis: "y",
 
-            maintainAspectRatio: false
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    animation: {
+        duration: 1200
+    },
+
+    scales: {
+
+        x: {
+
+            min: 0,
+
+            max: 100,
+
+            ticks: {
+
+                callback: value => value + "%"
+
+            }
 
         }
+
+    },
+
+    plugins: {
+
+        legend: {
+
+            display: false
+
+        },
+
+        tooltip: {
+
+            callbacks: {
+
+                label: function(context) {
+
+                    return context.raw + "% de efetividade";
+
+                }
+
+            }
+
+        }
+
+    }
+
+}
 
     });
 
 }
+
+
 
 // ================================
 // DATA E HORA EM TEMPO REAL
