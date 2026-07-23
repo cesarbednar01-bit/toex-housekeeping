@@ -101,8 +101,7 @@ function cacheDOM() {
 
         // CAMPOS
 
-        local: document.getElementById("local"),
-
+        
         area: document.getElementById("area"),
 
         atividade: document.getElementById("atividade"),
@@ -381,7 +380,7 @@ function limparFormulario() {
 
     const el = state.elementos;
 
-    el.local.value = "";
+    
 
     el.area.value = "";
 
@@ -418,13 +417,7 @@ function validarFormulario() {
 
     const el = state.elementos;
 
-    if (el.local.value === "") {
 
-        alert("Selecione o Local.");
-
-        return false;
-
-    }
 
     if (el.area.value === "") {
 
@@ -504,8 +497,7 @@ function salvarNovaAtividade() {
 
         id: gerarID(),
 
-        local: el.local.value,
-
+    
         area: el.area.value,
 
         atividade: el.atividade.value.trim(),
@@ -591,7 +583,6 @@ function renderizarTabela() {
 
             <td>${atividade.id}</td>
 
-            <td>${atividade.local}</td>
 
             <td>${atividade.area}</td>
 
@@ -708,8 +699,6 @@ function editarAtividade(id) {
 
     const el = state.elementos;
 
-    el.local.value = atividade.local;
-
     el.area.value = atividade.area;
 
     el.atividade.value = atividade.atividade;
@@ -751,7 +740,7 @@ function duplicarAtividade(id) {
     // Não estamos editando, vamos criar uma nova
     state.atividadeEditando = null;
 
-    el.local.value = atividade.local;
+    
     el.area.value = atividade.area;
     el.atividade.value = atividade.atividade;
     el.encarregado.value = atividade.encarregado;
