@@ -43,6 +43,8 @@ const state = {
 
     atividadeEditando: null,
 
+    fotosTemporarias: [],
+
     charts: {},
 
     firebaseInicializado: false,
@@ -101,7 +103,7 @@ function cacheDOM() {
 
         // CAMPOS
 
-        
+
         area: document.getElementById("area"),
 
         atividade: document.getElementById("atividade"),
@@ -122,7 +124,7 @@ function cacheDOM() {
 
         foto: document.getElementById("foto"),
 
-        
+
 
 
         // TABELA
@@ -195,19 +197,6 @@ function formatarHora() {
 
 
 
-function atualizarDataHora() {
-
-    if (!state.elementos.dataHora) return;
-
-    const agora = new Date();
-
-    state.elementos.dataHora.textContent =
-
-        agora.toLocaleString("pt-BR");
-
-}
-
-
 
 /*=========================================================
     MENSAGENS
@@ -241,11 +230,7 @@ function iniciarSistema() {
 
     setInterval(
 
-        atualizarDataHora,
-
-        CONFIG.atualizarRelogio
-
-    );
+        atualizarDataHora, 1000);
 
     carregarAtividades();
 
@@ -352,19 +337,9 @@ function configurarEventos() {
 
 
 
-/*=========================================================
-    MODAL
-=========================================================*/
 
-function abrirModal() {
 
-    limparFormulario();
 
-    state.atividadeEditando = null;
-
-    state.elementos.modal.classList.add("active");
-
-}
 
 
 
@@ -380,7 +355,7 @@ function limparFormulario() {
 
     const el = state.elementos;
 
-    
+
 
     el.area.value = "";
 
@@ -403,7 +378,7 @@ function limparFormulario() {
 
     el.foto.value = "";
 
-    
+
 
 }
 
@@ -497,7 +472,7 @@ function salvarNovaAtividade() {
 
         id: gerarID(),
 
-    
+
         area: el.area.value,
 
         atividade: el.atividade.value.trim(),
@@ -516,9 +491,9 @@ function salvarNovaAtividade() {
 
         progresso: Number(el.progresso.value),
 
-        
 
-        foto: null
+
+        fotos: []
 
     };
     if (state.atividadeEditando !== null) {
@@ -717,7 +692,7 @@ function editarAtividade(id) {
 
     el.progresso.value = atividade.progresso;
 
-    
+
 
     abrirModal(false);
 
@@ -740,7 +715,7 @@ function duplicarAtividade(id) {
     // Não estamos editando, vamos criar uma nova
     state.atividadeEditando = null;
 
-    
+
     el.area.value = atividade.area;
     el.atividade.value = atividade.atividade;
     el.encarregado.value = atividade.encarregado;
@@ -750,7 +725,13 @@ function duplicarAtividade(id) {
     el.inicio.value = atividade.inicio;
     el.prazo.value = atividade.prazo;
     el.progresso.value = atividade.progresso;
+
+    // Não duplicar as fotos
+    el.foto.value = "";
+
     
+    // Limpa qualquer foto temporária
+    state.fotosTemporarias = [];
 
     state.elementos.modal.classList.add("active");
 
@@ -1188,59 +1169,59 @@ function criarGraficoCriticidade() {
 
         options: {
 
-    indexAxis: "y",
+            indexAxis: "y",
 
-    responsive: true,
+            responsive: true,
 
-    maintainAspectRatio: false,
+            maintainAspectRatio: false,
 
-    animation: {
-        duration: 1200
-    },
+            animation: {
+                duration: 1200
+            },
 
-    scales: {
+            scales: {
 
-        x: {
+                x: {
 
-            min: 0,
+                    min: 0,
 
-            max: 100,
+                    max: 100,
 
-            ticks: {
+                    ticks: {
 
-                callback: value => value + "%"
+                        callback: value => value + "%"
 
-            }
+                    }
 
-        }
+                }
 
-    },
+            },
 
-    plugins: {
+            plugins: {
 
-        legend: {
+                legend: {
 
-            display: false
+                    display: false
 
-        },
+                },
 
-        tooltip: {
+                tooltip: {
 
-            callbacks: {
+                    callbacks: {
 
-                label: function(context) {
+                        label: function (context) {
 
-                    return context.raw + "% de efetividade";
+                            return context.raw + "% de efetividade";
+
+                        }
+
+                    }
 
                 }
 
             }
 
         }
-
-    }
-
-}
 
     });
 
@@ -1271,11 +1252,6 @@ function atualizarDataHora() {
     }
 }
 
-// Atualiza imediatamente
-atualizarDataHora();
-
-// Atualiza a cada segundo
-setInterval(atualizarDataHora, 1000);
 
 /*=========================================================
     LOGOUT
