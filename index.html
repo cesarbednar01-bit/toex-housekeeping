@@ -48,34 +48,38 @@
 
             <div class="informacoes">
 
-                <div class="lado-esquerdo">
+    <div class="lado-esquerdo">
 
-                    <div class="info">
-                        <strong id="dataHora"></strong>
-                    </div>
+        <div class="info">
+            <strong id="dataHora"></strong>
+        </div>
 
-                    <button class="btn-sair" onclick="logout()">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                        Sair
-                    </button>
+        <button class="btn-sair" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            Sair
+        </button>
 
-                </div>
+    </div>
 
-                <div class="lado-direito">
+    <div class="lado-direito">
 
-                    <h5>Período:</h5>
+        <h5>Período</h5>
 
-                    <input type="date" id="dataInicio">
+        <div class="filtro-periodo">
 
-                    <input type="date" id="dataFim">
+            <input type="date" id="dataInicio">
 
-                    <button class="btn-aplicar" onclick="filtrarPeriodo()">
-                        Aplicar
-                    </button>
+            <input type="date" id="dataFim">
 
-                </div>
+            <button class="btn-aplicar" onclick="filtrarPeriodo()">
+                Aplicar
+            </button>
 
-            </div>
+        </div>
+
+    </div>
+
+</div>
 
         </header>
 
@@ -328,6 +332,11 @@
 
                 <div class="acoes">
 
+                    <button id="btnHistorico" class="btn btn-historico">
+                        <i class="fas fa-history"></i>
+                        Histórico
+                    </button>
+
                     <button class="btn-exportar" id="btnPDF">
 
                         <i class="fa-solid fa-file-pdf"></i>
@@ -501,7 +510,7 @@
 
                                 <option>Alta</option>
 
-                            
+
                             </select>
 
                         </div>
@@ -570,7 +579,7 @@
 
                     </div>
 
-                                      
+
                 </div>
 
                 <!-- RODAPÉ DO MODAL -->

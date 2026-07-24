@@ -168,8 +168,9 @@ LADO DIREITO DO HEADER
 
 .informacoes{
     display:flex;
-    align-items:flex-start;
-    gap:18px;
+    align-items:center;
+    gap:25px;
+
 }
 
 .lado-esquerdo{
@@ -183,8 +184,9 @@ LADO DIREITO DO HEADER
 .lado-direito{
     display:flex;
     flex-direction:column;
-    align-items:center;
-    gap:10px;
+    justify-content:flex-end;
+    align-items:flex-start;
+    gap:8px;
 }
 
 .lado-direito h5{
@@ -194,9 +196,25 @@ LADO DIREITO DO HEADER
     margin:0;
 }
 
+.filtro-periodo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.filtro-periodo input{
+    width:145px;
+    height:40px;
+}
+
+.filtro-periodo .btn-aplicar{
+    width:100px;
+    height:40px;
+}
+
 .info{
-    width:110px;
-    height:58px;
+    width:140px;
+    height:60px;
 
     display:flex;
     justify-content:center;
@@ -205,15 +223,25 @@ LADO DIREITO DO HEADER
     background:rgba(255,255,255,.15);
 
     border-radius:10px;
-
-    text-align:center;
 }
 
 .info strong{
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    width:100%;
+    height:100%;
+
     color:#fff;
-    font-size:12px;
-    line-height:1.2;
+
+    font-size:13px;
     font-weight:700;
+    line-height:1.4;
+
+    text-align:center;
 }
 
 .lado-direito input{
@@ -888,6 +916,20 @@ BOTÕES
 .btn-nova:hover {
 
     background: #082240;
+
+}
+
+.btn-historico {
+
+    background: #16A34A;
+    color: #FFF;
+
+}
+
+.btn-historico:hover {
+
+    background: #15803D;
+    transform: translateY(-2px);
 
 }
 
