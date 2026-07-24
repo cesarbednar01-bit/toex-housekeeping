@@ -51,6 +51,8 @@ const state = {
 
     carregando: false,
 
+    mostrarHistorico: false,
+
     elementos: {}
 
 };
@@ -88,6 +90,8 @@ function cacheDOM() {
         btnPDF: document.getElementById("btnPDF"),
 
         btnImprimir: document.querySelector(".btn-imprimir"),
+
+        btnHistorico: document.getElementById("btnHistorico"),
 
 
         // MODAL
@@ -314,6 +318,11 @@ function configurarEventos() {
 
     );
 
+ el.btnHistorico?.addEventListener(
+    "click",
+    alternarHistorico
+);
+
 
     // FECHAR MODAL CLICANDO FORA
 
@@ -458,6 +467,34 @@ function renderizarSistema() {
 
 }
 
+function alternarHistorico() {
+
+    state.mostrarHistorico = !state.mostrarHistorico;
+
+    const titulo = document.getElementById("tituloTabela");
+    const botao = document.getElementById("btnHistorico");
+
+    if (state.mostrarHistorico) {
+
+        titulo.textContent = "Histórico de Atividades";
+
+        botao.innerHTML =
+            '<i class="fa-solid fa-arrow-left"></i> Voltar';
+
+    } else {
+
+        titulo.textContent =
+            "Lista Operacional de Atividades";
+
+        botao.innerHTML =
+            '<i class="fa-solid fa-clock-rotate-left"></i> Histórico';
+
+    }
+
+    renderizarTabela();
+
+}
+
 /*=========================================================
     SALVAR NOVA ATIVIDADE
 =========================================================*/
@@ -549,15 +586,17 @@ function renderizarTabela() {
 
         return;
     }
+    const lista = state.mostrarHistorico
+        ? state.atividades.filter(a => a.status === "Concluído")
+        : state.atividades.filter(a => a.status !== "Concluído");
 
-    state.atividades.forEach((atividade) => {
+    lista.forEach((atividade) => {
 
         const tr = document.createElement("tr");
 
         tr.innerHTML = `
 
             <td>${atividade.id}</td>
-
 
             <td>${atividade.area}</td>
 
@@ -582,35 +621,31 @@ function renderizarTabela() {
             <td>${atividade.progresso}%</td>
 
             <td>
+                <div class="acoes-tabela">
 
-    <button
-        class="btn-acao duplicar"
-        onclick="duplicarAtividade(${atividade.id})"
-        title="Duplicar">
+                    <button
+                        class="btn-acao duplicar"
+                        onclick="duplicarAtividade(${atividade.id})"
+                        title="Duplicar">
+                        <i class="fa-solid fa-copy"></i>
+                    </button>
 
-        <i class="fa-solid fa-copy"></i>
+                    <button
+                        class="btn-acao editar"
+                        onclick="editarAtividade(${atividade.id})"
+                        title="Editar">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
 
-    </button>
+                    <button
+                        class="btn-acao excluir"
+                        onclick="excluirAtividade(${atividade.id})"
+                        title="Excluir">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
 
-    <button
-        class="btn-acao editar"
-        onclick="editarAtividade(${atividade.id})"
-        title="Editar">
-
-        <i class="fa-solid fa-pen"></i>
-
-    </button>
-
-    <button
-        class="btn-acao excluir"
-        onclick="excluirAtividade(${atividade.id})"
-        title="Excluir">
-
-        <i class="fa-solid fa-trash"></i>
-
-    </button>
-
-</td>
+                </div>
+            </td>
 
         `;
 
@@ -619,7 +654,6 @@ function renderizarTabela() {
     });
 
 }
-
 
 
 /*=========================================================
@@ -729,7 +763,7 @@ function duplicarAtividade(id) {
     // Não duplicar as fotos
     el.foto.value = "";
 
-    
+
     // Limpa qualquer foto temporária
     state.fotosTemporarias = [];
 
@@ -1385,3 +1419,97 @@ function renderizarTabelaFiltrada(lista) {
     });
 
 }
+
+/*=========================================================
+    EXPORTAR PDF
+=========================================================*/
+
+function exportarPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF({
+        orientation: "landscape",
+        unit: "mm",
+        format: "a4"
+    });
+
+    doc.setFontSize(18);
+    doc.setTextColor(0, 59, 113);
+    doc.text("HOUSEKEEPING - TERMINAL TOEX", 14, 15);
+
+    doc.setFontSize(10);
+    doc.setTextColor(80);
+
+    doc.text(
+        "Relatório emitido em: " +
+        new Date().toLocaleString("pt-BR"),
+        14,
+        22
+    );
+
+    const linhas = state.atividades.map(a => [
+
+        a.id,
+        a.area,
+        a.atividade,
+        a.encarregado,
+        a.colaborador,
+        a.prioridade,
+        a.status,
+        formatarData(a.inicio),
+        formatarData(a.prazo),
+        a.progresso + "%"
+
+    ]);
+
+    doc.autoTable({
+
+        startY: 28,
+
+        head: [[
+            "ID",
+            "Área",
+            "Atividade",
+            "Encarregado",
+            "Colaborador",
+            "Prioridade",
+            "Status",
+            "Início",
+            "Prazo",
+            "%"
+        ]],
+
+        body: linhas,
+
+        headStyles: {
+            fillColor: [0, 59, 113]
+        },
+
+        styles: {
+            fontSize: 8,
+            cellPadding: 2
+        }
+
+    });
+
+    doc.save("Housekeeping_TOEX.pdf");
+
+}
+
+/*=========================================================
+    IMPRIMIR
+=========================================================*/
+
+function imprimirSistema() {
+
+    window.print();
+
+}
+
+// HISTÓRICO
+
+el.btnHistorico?.addEventListener(
+    "click",
+    alternarHistorico
+);

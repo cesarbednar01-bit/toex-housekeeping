@@ -1918,3 +1918,19 @@ MODAL HOUSEKEEPING
 
 }
 
+/*==========================================
+AÇÕES DA TABELA
+==========================================*/
+
+.acoes-tabela{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:70px;
+}
+
+.acoes-tabela .btn-acao{
+    margin:0;
+    flex-shrink:0;
+}
