@@ -53,6 +53,8 @@ const state = {
 
     mostrarHistorico: false,
 
+    filtroHistorico: null,
+
     elementos: {}
 
 };
@@ -631,9 +633,24 @@ function renderizarTabela() {
 
         return;
     }
-    const lista = state.mostrarHistorico
-        ? state.atividades.filter(a => a.status === "Concluído")
-        : state.atividades.filter(a => a.status !== "Concluído");
+
+    let lista;
+
+    if (state.mostrarHistorico) {
+
+        lista = state.filtroHistorico
+            ? state.filtroHistorico
+            : state.atividades.filter(
+                a => a.status === "Concluído"
+            );
+
+    } else {
+
+        lista = state.atividades.filter(
+            a => a.status !== "Concluído"
+        );
+
+    }
 
     lista.forEach((atividade) => {
 
@@ -1397,7 +1414,9 @@ function filtrarPeriodo() {
 
     });
 
-    renderizarTabelaFiltrada(listaFiltrada);
+    state.filtroHistorico = listaFiltrada;
+
+    renderizarTabela();
 
 }
 
