@@ -39,6 +39,8 @@ const state = {
 
     atividades: [],
 
+    atividadesFiltradas: [],
+
     atividadeSelecionada: null,
 
     atividadeEditando: null,
@@ -53,11 +55,56 @@ const state = {
 
     mostrarHistorico: false,
 
-    filtroHistorico: null,
-
     elementos: {}
 
 };
+
+
+// <-- NOVA FUNÇÃO AQUI
+
+function obterLista() {
+
+    if (state.atividadesFiltradas.length > 0) {
+
+        return state.atividadesFiltradas;
+
+    }
+
+    return state.atividades;
+
+}
+
+function aplicarFiltros() {
+
+    let lista = [...state.atividades];
+
+    const dataInicio = document.getElementById("dataInicio")?.value;
+    const dataFim = document.getElementById("dataFim")?.value;
+
+    if (dataInicio && dataFim) {
+
+        lista = lista.filter((atividade) => {
+
+            const dataComparacao =
+                atividade.status === "Concluído"
+                    ? atividade.dataConclusao
+                    : atividade.inicio;
+
+            if (!dataComparacao) return false;
+
+            return (
+                dataComparacao >= dataInicio &&
+                dataComparacao <= dataFim
+            );
+
+        });
+
+    }
+
+    state.atividadesFiltradas = lista;
+
+}
+
 
 // ======================================
 // VERIFICA SE O USUÁRIO ESTÁ LOGADO
@@ -94,6 +141,8 @@ function cacheDOM() {
         btnImprimir: document.querySelector(".btn-imprimir"),
 
         btnHistorico: document.getElementById("btnHistorico"),
+
+        btnAplicar: document.getElementById("btnAplicar"),
 
 
         // MODAL
@@ -199,7 +248,9 @@ function formatarData(data) {
 
     if (!data) return "";
 
-    return new Date(data).toLocaleDateString("pt-BR");
+    const [ano, mes, dia] = data.split("-");
+
+    return `${dia}/${mes}/${ano}`;
 
 }
 
@@ -257,7 +308,7 @@ function iniciarSistema() {
 
     carregarAtividades();
 
-    inicializarDashboard();
+    //inicializarDashboard();
 
     renderizarSistema();
 
@@ -284,6 +335,7 @@ function configurarEventos() {
         abrirModal
 
     );
+
 
 
     // FECHAR MODAL
@@ -340,6 +392,11 @@ function configurarEventos() {
     el.btnHistorico?.addEventListener(
         "click",
         alternarHistorico
+    );
+
+    el.btnAplicar?.addEventListener(
+        "click",
+        filtrarPeriodo
     );
 
 
@@ -621,12 +678,14 @@ function renderizarTabela() {
 
     tbody.innerHTML = "";
 
-    if (state.atividades.length === 0) {
+    const atividades = obterLista();
+
+    if (atividades.length === 0) {
 
         tbody.innerHTML = `
             <tr>
                 <td colspan="11" class="sem-registros">
-                    Nenhuma atividade cadastrada.
+                    Nenhuma atividade encontrada.
                 </td>
             </tr>
         `;
@@ -634,23 +693,9 @@ function renderizarTabela() {
         return;
     }
 
-    let lista;
-
-    if (state.mostrarHistorico) {
-
-        lista = state.filtroHistorico
-            ? state.filtroHistorico
-            : state.atividades.filter(
-                a => a.status === "Concluído"
-            );
-
-    } else {
-
-        lista = state.atividades.filter(
-            a => a.status !== "Concluído"
-        );
-
-    }
+    const lista = state.mostrarHistorico
+        ? atividades.filter(a => a.status === "Concluído")
+        : atividades.filter(a => a.status !== "Concluído");
 
     lista.forEach((atividade) => {
 
@@ -909,30 +954,24 @@ function selecionarAtividade(id) {
 
 function atualizarKPIs() {
 
-    const total = state.atividades.length;
+    const atividades = obterLista();
 
-    const concluidas = state.atividades.filter(
+    const total = atividades.length;
 
+    const concluidas = atividades.filter(
         item => item.status === "Concluído"
-
     ).length;
 
-    const andamento = state.atividades.filter(
-
+    const andamento = atividades.filter(
         item => item.status === "Em andamento"
-
     ).length;
 
-    const pendentes = state.atividades.filter(
-
+    const pendentes = atividades.filter(
         item => item.status === "Pendente"
-
     ).length;
 
-    const atrasadas = state.atividades.filter(
-
+    const atrasadas = atividades.filter(
         item => item.status === "Atrasado"
-
     ).length;
 
     const percentual = total === 0
@@ -940,17 +979,11 @@ function atualizarKPIs() {
         : Math.round((concluidas / total) * 100);
 
     atualizarCard("kpiTotal", total);
-
     atualizarCard("kpiConcluidas", concluidas);
-
     atualizarCard("kpiAndamento", andamento);
-
     atualizarCard("kpiPendentes", pendentes);
-
     atualizarCard("kpiAtrasadas", atrasadas);
-
     atualizarCard("percentualConclusao", percentual + "%");
-
     atualizarCard("efetividadeValor", percentual + "%");
 
     atualizarBarraEfetividade(percentual);
@@ -1051,13 +1084,15 @@ function criarGraficoStatus() {
 
     if (!ctx) return;
 
-    const concluidas = state.atividades.filter(a => a.status === "Concluído").length;
+    const atividades = obterLista();
 
-    const andamento = state.atividades.filter(a => a.status === "Em andamento").length;
+    const concluidas = atividades.filter(a => a.status === "Concluído").length;
 
-    const pendentes = state.atividades.filter(a => a.status === "Pendente").length;
+    const andamento = atividades.filter(a => a.status === "Em andamento").length;
 
-    const atrasadas = state.atividades.filter(a => a.status === "Atrasado").length;
+    const pendentes = atividades.filter(a => a.status === "Pendente").length;
+
+    const atrasadas = atividades.filter(a => a.status === "Atrasado").length;
 
     state.charts.status = new Chart(ctx, {
 
@@ -1110,16 +1145,17 @@ function criarGraficoStatus() {
 /*=========================================================
     COLABORADOR
 =========================================================*/
-
 function criarGraficoColaborador() {
 
     const ctx = state.elementos.graficoColaborador;
 
     if (!ctx) return;
 
+    const atividades = obterLista();
+
     const dados = {};
 
-    state.atividades.forEach(a => {
+    atividades.forEach(a => {
 
         dados[a.colaborador] =
 
@@ -1157,6 +1193,7 @@ function criarGraficoColaborador() {
 
 }
 
+
 /*=========================================================
     ÁREA
 =========================================================*/
@@ -1167,9 +1204,11 @@ function criarGraficoArea() {
 
     if (!ctx) return;
 
+    const atividades = obterLista();
+
     const dados = {};
 
-    state.atividades.forEach(a => {
+    atividades.forEach(a => {
 
         dados[a.area] =
 
@@ -1217,9 +1256,11 @@ function criarGraficoCriticidade() {
 
     if (!ctx) return;
 
+    const atividades = obterLista();
+
     const colaboradores = {};
 
-    state.atividades.forEach((atividade) => {
+    atividades.forEach((atividade) => {
 
         if (!colaboradores[atividade.colaborador]) {
 
@@ -1389,115 +1430,43 @@ function filtrarPeriodo() {
         return;
     }
 
-    const listaFiltrada = state.atividades.filter((atividade) => {
+    aplicarFiltros();
 
-        // Quando estiver no Histórico
-        if (state.mostrarHistorico) {
+    renderizarSistema();
 
-            if (!atividade.dataConclusao) return false;
+}
+
+function aplicarFiltros() {
+
+    const dataInicio = document.getElementById("dataInicio").value;
+    const dataFim = document.getElementById("dataFim").value;
+
+    let lista = [...state.atividades];
+
+    if (dataInicio && dataFim) {
+
+        lista = lista.filter((atividade) => {
+
+            const dataComparacao =
+                atividade.status === "Concluído"
+                    ? atividade.dataConclusao
+                    : atividade.inicio;
+
+            if (!dataComparacao) return false;
 
             return (
-                atividade.status === "Concluído" &&
-                atividade.dataConclusao >= dataInicio &&
-                atividade.dataConclusao <= dataFim
+                dataComparacao >= dataInicio &&
+                dataComparacao <= dataFim
             );
-        }
 
-        // Lista Operacional
-        if (!atividade.inicio) return false;
+        });
 
-        return (
-            atividade.status !== "Concluído" &&
-            atividade.inicio >= dataInicio &&
-            atividade.inicio <= dataFim
-        );
-
-    });
-
-    state.filtroHistorico = listaFiltrada;
-
-    renderizarTabela();
-
-}
-
-/*=========================================================
-    RENDERIZAR TABELA FILTRADA
-=========================================================*/
-
-function renderizarTabelaFiltrada(lista) {
-
-    const tbody = state.elementos.tabela;
-
-    if (!tbody) return;
-
-    tbody.innerHTML = "";
-
-    if (lista.length === 0) {
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="11" class="sem-registros">
-                    Nenhuma atividade encontrada para o período informado.
-                </td>
-            </tr>
-        `;
-
-        return;
     }
 
-    lista.forEach((atividade) => {
-
-        const tr = document.createElement("tr");
-
-        tr.innerHTML = `
-            <td>${atividade.id}</td>
-            <td>${atividade.area}</td>
-            <td>${atividade.atividade}</td>
-            <td>${atividade.encarregado}</td>
-            <td>${atividade.colaborador}</td>
-
-            <td>
-                ${criarBadgePrioridade(atividade.prioridade)}
-            </td>
-
-            <td>
-                ${criarBadgeStatus(atividade.status)}
-            </td>
-
-            <td>${formatarData(atividade.inicio)}</td>
-
-            <td>${formatarData(atividade.prazo)}</td>
-
-            <td>${atividade.progresso}%</td>
-
-            <td>
-
-                <button
-                    class="btn-acao duplicar"
-                    onclick="duplicarAtividade(${atividade.id})">
-                    <i class="fa-solid fa-copy"></i>
-                </button>
-
-                <button
-                    class="btn-acao editar"
-                    onclick="editarAtividade(${atividade.id})">
-                    <i class="fa-solid fa-pen"></i>
-                </button>
-
-                <button
-                    class="btn-acao excluir"
-                    onclick="excluirAtividade(${atividade.id})">
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-
-            </td>
-        `;
-
-        tbody.appendChild(tr);
-
-    });
+    state.atividadesFiltradas = lista;
 
 }
+
 
 /*=========================================================
     EXPORTAR PDF
