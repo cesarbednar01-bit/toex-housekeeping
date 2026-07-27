@@ -3,11 +3,35 @@
 // LOGIN
 // ========================================
 
-// Usuário padrão (temporário)
-const USUARIO = "admin";
-const SENHA = "123456";
+// ========================================
+// USUÁRIOS DO SISTEMA (TEMPORÁRIO)
+// Futuramente estes dados virão do Firebase.
+// ========================================
 
-// Elementos
+const USUARIOS = [
+
+    {
+        id: 1,
+        usuario: "Cesar.Bednarczuk",
+        senha: "Moxaki123",
+        nome: "Cesar Bednarczuk",
+        perfil: "Administrador"
+    },
+
+    {
+        id: 2,
+        usuario: "Rayan.Cardoso",
+        senha: "Choraboy123",
+        nome: "Rayan Cardoso",
+        perfil: "Operador"
+    }
+
+];
+
+// ========================================
+// ELEMENTOS
+// ========================================
+
 const inputUsuario = document.getElementById("usuario");
 const inputSenha = document.getElementById("senha");
 const btnEntrar = document.getElementById("btnEntrar");
@@ -51,14 +75,22 @@ function realizarLogin() {
     if (usuario === "" || senha === "") {
 
         alert("Preencha usuário e senha.");
-
         return;
 
     }
 
-    if (usuario === USUARIO && senha === SENHA) {
+    const usuarioEncontrado = USUARIOS.find(u =>
+        u.usuario.toLowerCase() === usuario.toLowerCase() &&
+        u.senha === senha
+    );
 
-        sessionStorage.setItem("usuarioLogado", usuario);
+    if (usuarioEncontrado) {
+
+        // Salva todas as informações do usuário
+        sessionStorage.setItem(
+            "usuarioLogado",
+            JSON.stringify(usuarioEncontrado)
+        );
 
         window.location.href = "index.html";
 
@@ -67,7 +99,6 @@ function realizarLogin() {
         alert("Usuário ou senha inválidos.");
 
         inputSenha.value = "";
-
         inputSenha.focus();
 
     }
@@ -80,7 +111,7 @@ function realizarLogin() {
 
 btnEntrar.addEventListener("click", realizarLogin);
 
-inputSenha.addEventListener("keypress", function (e) {
+inputUsuario.addEventListener("keypress", function (e) {
 
     if (e.key === "Enter") {
 
@@ -90,7 +121,7 @@ inputSenha.addEventListener("keypress", function (e) {
 
 });
 
-inputUsuario.addEventListener("keypress", function (e) {
+inputSenha.addEventListener("keypress", function (e) {
 
     if (e.key === "Enter") {
 

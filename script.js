@@ -158,6 +158,21 @@ function cacheDOM() {
 
 }
 
+/*=========================================================
+    USUÁRIO LOGADO
+=========================================================*/
+
+function carregarUsuarioLogado() {
+
+    const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado"));
+
+    if (!usuario) return;
+
+    document.getElementById("nomeUsuario").textContent = usuario.nome;
+    document.getElementById("perfilUsuario").textContent = usuario.perfil;
+
+}
+
 
 
 /*=========================================================
@@ -229,6 +244,8 @@ function iniciarSistema() {
     cacheDOM();
 
     configurarEventos();
+
+    carregarUsuarioLogado();
 
     atualizarDataHora();
 
@@ -318,29 +335,13 @@ function configurarEventos() {
 
     );
 
- el.btnHistorico?.addEventListener(
-    "click",
-    alternarHistorico
-);
-
-
-    // FECHAR MODAL CLICANDO FORA
-
-    el.modal?.addEventListener(
-
+    el.btnHistorico?.addEventListener(
         "click",
-
-        function (e) {
-
-            if (e.target === el.modal) {
-
-                fecharModal();
-
-            }
-
-        }
-
+        alternarHistorico
     );
+
+
+
 
 }
 
@@ -506,98 +507,98 @@ function salvarNovaAtividade() {
     const el = state.elementos;
 
 
-   const atividade = {
-    id: gerarID(),
+    const atividade = {
+        id: gerarID(),
 
-    area: el.area.value,
-    atividade: el.atividade.value.trim(),
-    encarregado: el.encarregado.value,
-    colaborador: el.colaborador.value,
-    prioridade: el.prioridade.value,
-    status: el.status.value,
-    inicio: el.inicio.value,
-    prazo: el.prazo.value,
-    progresso: Number(el.progresso.value),
+        area: el.area.value,
+        atividade: el.atividade.value.trim(),
+        encarregado: el.encarregado.value,
+        colaborador: el.colaborador.value,
+        prioridade: el.prioridade.value,
+        status: el.status.value,
+        inicio: el.inicio.value,
+        prazo: el.prazo.value,
+        progresso: Number(el.progresso.value),
 
-    fotos: [],
+        fotos: [],
 
-    dataConclusao: null,
-    horaConclusao: null,
-    concluidoPor: null
-};
+        dataConclusao: null,
+        horaConclusao: null,
+        concluidoPor: null
+    };
 
-// Se a atividade foi concluída
-if (atividade.status === "Concluído") {
+    // Se a atividade foi concluída
+    if (atividade.status === "Concluído") {
 
-    const agora = new Date();
+        const agora = new Date();
 
-    atividade.dataConclusao = agora.toISOString().split("T")[0];
+        atividade.dataConclusao = agora.toISOString().split("T")[0];
 
-    atividade.horaConclusao = agora.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit"
-    });
+        atividade.horaConclusao = agora.toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit"
+        });
 
-    atividade.concluidoPor = "Rayan Cardoso";
-}
-
-
-   if (state.atividadeEditando !== null) {
-
-    atividade.id = state.atividadeEditando;
-
-    const indice = state.atividades.findIndex(
-        item => item.id === state.atividadeEditando
-    );
-
-    if (indice !== -1) {
-
-        const antiga = state.atividades[indice];
-
-        // Mantém as fotos existentes
-        atividade.fotos = antiga.fotos || [];
-
-        // Se já estava concluída anteriormente,
-        // mantém os dados da conclusão
-        if (antiga.dataConclusao) {
-
-            atividade.dataConclusao = antiga.dataConclusao;
-            atividade.horaConclusao = antiga.horaConclusao;
-            atividade.concluidoPor = antiga.concluidoPor;
-
-        }
-
-        // Se acabou de ser concluída agora,
-        // registra a conclusão
-        if (
-            atividade.status === "Concluído" &&
-            !atividade.dataConclusao
-        ) {
-
-            const agora = new Date();
-
-            atividade.dataConclusao =
-                agora.toISOString().split("T")[0];
-
-            atividade.horaConclusao =
-                agora.toLocaleTimeString("pt-BR", {
-                    hour: "2-digit",
-                    minute: "2-digit"
-                });
-
-            atividade.concluidoPor = "Rayan Cardoso";
-
-        }
-
-        state.atividades[indice] = atividade;
-
+        atividade.concluidoPor = "Rayan Cardoso";
     }
 
-} else {
 
-    state.atividades.push(atividade);
+    if (state.atividadeEditando !== null) {
 
-}
+        atividade.id = state.atividadeEditando;
+
+        const indice = state.atividades.findIndex(
+            item => item.id === state.atividadeEditando
+        );
+
+        if (indice !== -1) {
+
+            const antiga = state.atividades[indice];
+
+            // Mantém as fotos existentes
+            atividade.fotos = antiga.fotos || [];
+
+            // Se já estava concluída anteriormente,
+            // mantém os dados da conclusão
+            if (antiga.dataConclusao) {
+
+                atividade.dataConclusao = antiga.dataConclusao;
+                atividade.horaConclusao = antiga.horaConclusao;
+                atividade.concluidoPor = antiga.concluidoPor;
+
+            }
+
+            // Se acabou de ser concluída agora,
+            // registra a conclusão
+            if (
+                atividade.status === "Concluído" &&
+                !atividade.dataConclusao
+            ) {
+
+                const agora = new Date();
+
+                atividade.dataConclusao =
+                    agora.toISOString().split("T")[0];
+
+                atividade.horaConclusao =
+                    agora.toLocaleTimeString("pt-BR", {
+                        hour: "2-digit",
+                        minute: "2-digit"
+                    });
+
+                atividade.concluidoPor = "Rayan Cardoso";
+
+            }
+
+            state.atividades[indice] = atividade;
+
+        }
+
+    } else {
+
+        state.atividades.push(atividade);
+
+    }
 
 
     fecharModal();
@@ -790,31 +791,36 @@ function duplicarAtividade(id) {
 
     const el = state.elementos;
 
-    // Não estamos editando, vamos criar uma nova
+    // Será uma nova atividade
     state.atividadeEditando = null;
 
+    // Abre o modal sem limpar os campos
+    abrirModal(false);
 
+    // Copia os dados principais
     el.area.value = atividade.area;
     el.atividade.value = atividade.atividade;
     el.encarregado.value = atividade.encarregado;
     el.colaborador.value = atividade.colaborador;
     el.prioridade.value = atividade.prioridade;
+
+    // Copia também os demais dados da atividade
     el.status.value = atividade.status;
     el.inicio.value = atividade.inicio;
     el.prazo.value = atividade.prazo;
     el.progresso.value = atividade.progresso;
 
-    // Não duplicar as fotos
+    // Não duplica fotos
     el.foto.value = "";
-
-
-    // Limpa qualquer foto temporária
     state.fotosTemporarias = [];
 
-    state.elementos.modal.classList.add("active");
+    // Coloca o cursor na atividade
+    setTimeout(() => {
+        el.atividade.focus();
+        el.atividade.select();
+    }, 100);
 
 }
-
 
 /*=========================================================
  MODAL
@@ -1488,9 +1494,9 @@ async function exportarPDF() {
         format: "a4"
     });
 
-    const azul = [0,59,113];
-    const laranja = [245,130,32];
-    const cinza = [90,90,90];
+    const azul = [0, 59, 113];
+    const laranja = [245, 130, 32];
+    const cinza = [90, 90, 90];
 
     const hoje = new Date();
 
@@ -1501,34 +1507,34 @@ async function exportarPDF() {
         hoje.toLocaleTimeString("pt-BR");
 
     const lista = state.mostrarHistorico
-        ? state.atividades.filter(a=>a.status==="Concluído")
-        : state.atividades.filter(a=>a.status!=="Concluído");
+        ? state.atividades.filter(a => a.status === "Concluído")
+        : state.atividades.filter(a => a.status !== "Concluído");
 
     const total = lista.length;
 
     const concluidas =
-        lista.filter(a=>a.status==="Concluído").length;
+        lista.filter(a => a.status === "Concluído").length;
 
     const andamento =
-        lista.filter(a=>a.status==="Em andamento").length;
+        lista.filter(a => a.status === "Em andamento").length;
 
     const pendentes =
-        lista.filter(a=>a.status==="Pendente").length;
+        lista.filter(a => a.status === "Pendente").length;
 
     const atrasadas =
-        lista.filter(a=>a.status==="Atrasado").length;
+        lista.filter(a => a.status === "Atrasado").length;
 
     const efetividade =
-        total===0
-        ?0
-        :Math.round((concluidas/total)*100);
+        total === 0
+            ? 0
+            : Math.round((concluidas / total) * 100);
 
     // ==========================================
     // CAPA
     // ==========================================
 
     doc.setFillColor(...azul);
-    doc.rect(0,0,297,25,"F");
+    doc.rect(0, 0, 297, 25, "F");
 
     doc.setTextColor(255);
 
@@ -1572,13 +1578,13 @@ async function exportarPDF() {
 
     doc.text(
         state.mostrarHistorico
-        ? "Modo: Histórico"
-        : "Modo: Operacional",
+            ? "Modo: Histórico"
+            : "Modo: Operacional",
         14,
         59
     );
 
-        // ===============================
+    // ===============================
     // KPI
     // ===============================
 
@@ -1586,23 +1592,23 @@ async function exportarPDF() {
 
     const cards = [
 
-        ["TOTAL",total],
+        ["TOTAL", total],
 
-        ["CONCLUÍDAS",concluidas],
+        ["CONCLUÍDAS", concluidas],
 
-        ["EM ANDAMENTO",andamento],
+        ["EM ANDAMENTO", andamento],
 
-        ["PENDENTES",pendentes],
+        ["PENDENTES", pendentes],
 
-        ["ATRASADAS",atrasadas],
+        ["ATRASADAS", atrasadas],
 
-        ["EFETIVIDADE",efetividade+"%"]
+        ["EFETIVIDADE", efetividade + "%"]
 
     ];
 
-    cards.forEach(card=>{
+    cards.forEach(card => {
 
-        doc.setFillColor(248,249,250);
+        doc.setFillColor(248, 249, 250);
 
         doc.roundedRect(
             x,
@@ -1631,7 +1637,7 @@ async function exportarPDF() {
 
         doc.text(
             card[0],
-            x+3,
+            x + 3,
             81
         );
 
@@ -1639,14 +1645,14 @@ async function exportarPDF() {
 
         doc.text(
             String(card[1]),
-            x+3,
+            x + 3,
             94
         );
 
         x += 46;
 
     });
-    
+
     // ==========================================
     // RESUMO EXECUTIVO
     // ==========================================
@@ -1701,7 +1707,7 @@ async function exportarPDF() {
 
     let y = 128;
 
-    resumo.forEach(item=>{
+    resumo.forEach(item => {
 
         doc.text(
             item,
@@ -1717,7 +1723,7 @@ async function exportarPDF() {
     // OBSERVAÇÃO
     // ==========================================
 
-    doc.setFillColor(245,245,245);
+    doc.setFillColor(245, 245, 245);
 
     doc.roundedRect(
         15,
@@ -1751,7 +1757,7 @@ async function exportarPDF() {
 
     doc.addPage();
 
-        // ==========================================
+    // ==========================================
     // TÍTULO DA TABELA
     // ==========================================
 
@@ -1802,9 +1808,9 @@ async function exportarPDF() {
 
     doc.autoTable({
 
-        startY:30,
+        startY: 30,
 
-        head:[[
+        head: [[
             "ID",
             "Área",
             "Atividade",
@@ -1816,32 +1822,32 @@ async function exportarPDF() {
             "%"
         ]],
 
-        body:linhas,
+        body: linhas,
 
-        styles:{
-            fontSize:8,
-            cellPadding:2,
-            valign:"middle"
+        styles: {
+            fontSize: 8,
+            cellPadding: 2,
+            valign: "middle"
         },
 
-        headStyles:{
-            fillColor:azul,
-            textColor:255,
-            fontStyle:"bold"
+        headStyles: {
+            fillColor: azul,
+            textColor: 255,
+            fontStyle: "bold"
         },
 
-        alternateRowStyles:{
-            fillColor:[245,245,245]
+        alternateRowStyles: {
+            fillColor: [245, 245, 245]
         },
 
-        margin:{
-            left:10,
-            right:10
+        margin: {
+            left: 10,
+            right: 10
         }
 
     });
 
-        // ==========================================
+    // ==========================================
     // NOVA PÁGINA PARA OS GRÁFICOS
     // ==========================================
 
@@ -1857,7 +1863,7 @@ async function exportarPDF() {
         18
     );
 
-        // ==========================================
+    // ==========================================
     // CAPTURA DOS GRÁFICOS
     // ==========================================
 
@@ -1876,36 +1882,36 @@ async function exportarPDF() {
     const imgStatus = await html2canvas(
         canvasStatus.parentElement,
         {
-            backgroundColor:"#ffffff",
-            scale:2
+            backgroundColor: "#ffffff",
+            scale: 2
         }
     );
 
     const imgArea = await html2canvas(
         canvasArea.parentElement,
         {
-            backgroundColor:"#ffffff",
-            scale:2
+            backgroundColor: "#ffffff",
+            scale: 2
         }
     );
 
     const imgColaborador = await html2canvas(
         canvasColaborador.parentElement,
         {
-            backgroundColor:"#ffffff",
-            scale:2
+            backgroundColor: "#ffffff",
+            scale: 2
         }
     );
 
     const imgEfetividade = await html2canvas(
         canvasEfetividade.parentElement,
         {
-            backgroundColor:"#ffffff",
-            scale:2
+            backgroundColor: "#ffffff",
+            scale: 2
         }
     );
 
-        doc.addImage(
+    doc.addImage(
         imgStatus.toDataURL("image/png"),
         "PNG",
         10,
@@ -1941,13 +1947,13 @@ async function exportarPDF() {
         80
     );
 
-        // ==========================================
+    // ==========================================
     // RODAPÉ
     // ==========================================
 
     const paginas = doc.getNumberOfPages();
 
-    for(let i=1;i<=paginas;i++){
+    for (let i = 1; i <= paginas; i++) {
 
         doc.setPage(i);
 
@@ -1992,9 +1998,3 @@ function imprimirSistema() {
 
 }
 
-// HISTÓRICO
-
-el.btnHistorico?.addEventListener(
-    "click",
-    alternarHistorico
-);

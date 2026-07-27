@@ -1934,3 +1934,42 @@ AÇÕES DA TABELA
     margin:0;
     flex-shrink:0;
 }
+
+/*==========================================
+USUÁRIO LOGADO
+==========================================*/
+
+.usuario-logado{
+    width:180px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    text-align:center;
+
+    color:#fff;
+}
+
+.avatar-usuario{
+    margin-bottom:8px;
+}
+
+.avatar-usuario i{
+    font-size:42px;
+    color:#fff;
+}
+
+#nomeUsuario{
+    font-size:17px;
+    font-weight:700;
+    line-height:1.2;
+}
+
+#perfilUsuario{
+    margin-top:4px;
+    font-size:13px;
+    font-weight:500;
+    color:rgba(255,255,255,.85);
+}
