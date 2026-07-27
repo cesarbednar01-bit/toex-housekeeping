@@ -505,55 +505,99 @@ function salvarNovaAtividade() {
 
     const el = state.elementos;
 
-    const atividade = {
 
-        id: gerarID(),
+   const atividade = {
+    id: gerarID(),
+
+    area: el.area.value,
+    atividade: el.atividade.value.trim(),
+    encarregado: el.encarregado.value,
+    colaborador: el.colaborador.value,
+    prioridade: el.prioridade.value,
+    status: el.status.value,
+    inicio: el.inicio.value,
+    prazo: el.prazo.value,
+    progresso: Number(el.progresso.value),
+
+    fotos: [],
+
+    dataConclusao: null,
+    horaConclusao: null,
+    concluidoPor: null
+};
+
+// Se a atividade foi concluída
+if (atividade.status === "Concluído") {
+
+    const agora = new Date();
+
+    atividade.dataConclusao = agora.toISOString().split("T")[0];
+
+    atividade.horaConclusao = agora.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+
+    atividade.concluidoPor = "Rayan Cardoso";
+}
 
 
-        area: el.area.value,
+   if (state.atividadeEditando !== null) {
 
-        atividade: el.atividade.value.trim(),
+    atividade.id = state.atividadeEditando;
 
-        encarregado: el.encarregado.value,
+    const indice = state.atividades.findIndex(
+        item => item.id === state.atividadeEditando
+    );
 
-        colaborador: el.colaborador.value,
+    if (indice !== -1) {
 
-        prioridade: el.prioridade.value,
+        const antiga = state.atividades[indice];
 
-        status: el.status.value,
+        // Mantém as fotos existentes
+        atividade.fotos = antiga.fotos || [];
 
-        inicio: el.inicio.value,
+        // Se já estava concluída anteriormente,
+        // mantém os dados da conclusão
+        if (antiga.dataConclusao) {
 
-        prazo: el.prazo.value,
-
-        progresso: Number(el.progresso.value),
-
-
-
-        fotos: []
-
-    };
-    if (state.atividadeEditando !== null) {
-
-        atividade.id = state.atividadeEditando;
-
-        const indice = state.atividades.findIndex(
-
-            item => item.id === state.atividadeEditando
-
-        );
-
-        if (indice !== -1) {
-
-            state.atividades[indice] = atividade;
+            atividade.dataConclusao = antiga.dataConclusao;
+            atividade.horaConclusao = antiga.horaConclusao;
+            atividade.concluidoPor = antiga.concluidoPor;
 
         }
 
-    } else {
+        // Se acabou de ser concluída agora,
+        // registra a conclusão
+        if (
+            atividade.status === "Concluído" &&
+            !atividade.dataConclusao
+        ) {
 
-        state.atividades.push(atividade);
+            const agora = new Date();
+
+            atividade.dataConclusao =
+                agora.toISOString().split("T")[0];
+
+            atividade.horaConclusao =
+                agora.toLocaleTimeString("pt-BR", {
+                    hour: "2-digit",
+                    minute: "2-digit"
+                });
+
+            atividade.concluidoPor = "Rayan Cardoso";
+
+        }
+
+        state.atividades[indice] = atividade;
 
     }
+
+} else {
+
+    state.atividades.push(atividade);
+
+}
 
 
     fecharModal();
@@ -1312,32 +1356,42 @@ function filtrarPeriodo() {
     const dataInicio = document.getElementById("dataInicio").value;
     const dataFim = document.getElementById("dataFim").value;
 
-    // Verifica se as datas foram informadas
     if (!dataInicio || !dataFim) {
         alert("Selecione a data inicial e a data final.");
         return;
     }
 
-    // Verifica se o período é válido
     if (dataInicio > dataFim) {
         alert("A data inicial não pode ser maior que a data final.");
         return;
     }
 
-    // Filtra as atividades
-    const atividadesFiltradas = state.atividades.filter((atividade) => {
+    const listaFiltrada = state.atividades.filter((atividade) => {
 
+        // Quando estiver no Histórico
+        if (state.mostrarHistorico) {
+
+            if (!atividade.dataConclusao) return false;
+
+            return (
+                atividade.status === "Concluído" &&
+                atividade.dataConclusao >= dataInicio &&
+                atividade.dataConclusao <= dataFim
+            );
+        }
+
+        // Lista Operacional
         if (!atividade.inicio) return false;
 
         return (
+            atividade.status !== "Concluído" &&
             atividade.inicio >= dataInicio &&
             atividade.inicio <= dataFim
         );
 
     });
 
-    // Renderiza a tabela filtrada
-    renderizarTabelaFiltrada(atividadesFiltradas);
+    renderizarTabelaFiltrada(listaFiltrada);
 
 }
 
@@ -1424,7 +1478,7 @@ function renderizarTabelaFiltrada(lista) {
     EXPORTAR PDF
 =========================================================*/
 
-function exportarPDF() {
+async function exportarPDF() {
 
     const { jsPDF } = window.jspdf;
 
@@ -1434,44 +1488,326 @@ function exportarPDF() {
         format: "a4"
     });
 
-    doc.setFontSize(18);
-    doc.setTextColor(0, 59, 113);
-    doc.text("HOUSEKEEPING - TERMINAL TOEX", 14, 15);
+    const azul = [0,59,113];
+    const laranja = [245,130,32];
+    const cinza = [90,90,90];
 
-    doc.setFontSize(10);
-    doc.setTextColor(80);
+    const hoje = new Date();
+
+    const data =
+        hoje.toLocaleDateString("pt-BR");
+
+    const hora =
+        hoje.toLocaleTimeString("pt-BR");
+
+    const lista = state.mostrarHistorico
+        ? state.atividades.filter(a=>a.status==="Concluído")
+        : state.atividades.filter(a=>a.status!=="Concluído");
+
+    const total = lista.length;
+
+    const concluidas =
+        lista.filter(a=>a.status==="Concluído").length;
+
+    const andamento =
+        lista.filter(a=>a.status==="Em andamento").length;
+
+    const pendentes =
+        lista.filter(a=>a.status==="Pendente").length;
+
+    const atrasadas =
+        lista.filter(a=>a.status==="Atrasado").length;
+
+    const efetividade =
+        total===0
+        ?0
+        :Math.round((concluidas/total)*100);
+
+    // ==========================================
+    // CAPA
+    // ==========================================
+
+    doc.setFillColor(...azul);
+    doc.rect(0,0,297,25,"F");
+
+    doc.setTextColor(255);
+
+    doc.setFontSize(24);
 
     doc.text(
-        "Relatório emitido em: " +
-        new Date().toLocaleString("pt-BR"),
+        "HOUSEKEEPING MANAGEMENT SYSTEM",
+        14,
+        15
+    );
+
+    doc.setFontSize(12);
+
+    doc.text(
+        "TERMINAL TOEX",
         14,
         22
     );
 
-    const linhas = state.atividades.map(a => [
+    doc.setTextColor(...cinza);
+
+    doc.setFontSize(11);
+
+    doc.text(
+        "Relatório Gerencial",
+        14,
+        38
+    );
+
+    doc.text(
+        "Emitido em: " + data + " às " + hora,
+        14,
+        45
+    );
+
+    doc.text(
+        "Usuário: Rayan Cardoso",
+        14,
+        52
+    );
+
+    doc.text(
+        state.mostrarHistorico
+        ? "Modo: Histórico"
+        : "Modo: Operacional",
+        14,
+        59
+    );
+
+        // ===============================
+    // KPI
+    // ===============================
+
+    let x = 15;
+
+    const cards = [
+
+        ["TOTAL",total],
+
+        ["CONCLUÍDAS",concluidas],
+
+        ["EM ANDAMENTO",andamento],
+
+        ["PENDENTES",pendentes],
+
+        ["ATRASADAS",atrasadas],
+
+        ["EFETIVIDADE",efetividade+"%"]
+
+    ];
+
+    cards.forEach(card=>{
+
+        doc.setFillColor(248,249,250);
+
+        doc.roundedRect(
+            x,
+            72,
+            42,
+            28,
+            2,
+            2,
+            "F"
+        );
+
+        doc.setDrawColor(...azul);
+
+        doc.roundedRect(
+            x,
+            72,
+            42,
+            28,
+            2,
+            2
+        );
+
+        doc.setTextColor(...azul);
+
+        doc.setFontSize(10);
+
+        doc.text(
+            card[0],
+            x+3,
+            81
+        );
+
+        doc.setFontSize(18);
+
+        doc.text(
+            String(card[1]),
+            x+3,
+            94
+        );
+
+        x += 46;
+
+    });
+    
+    // ==========================================
+    // RESUMO EXECUTIVO
+    // ==========================================
+
+    doc.setFontSize(16);
+    doc.setTextColor(...azul);
+
+    doc.text(
+        "Resumo Executivo",
+        15,
+        115
+    );
+
+    doc.setDrawColor(...laranja);
+
+    doc.line(
+        15,
+        118,
+        80,
+        118
+    );
+
+    doc.setFontSize(11);
+
+    doc.setTextColor(60);
+
+    let resumo = [];
+
+    resumo.push(
+        `• Total de atividades: ${total}`
+    );
+
+    resumo.push(
+        `• Concluídas: ${concluidas}`
+    );
+
+    resumo.push(
+        `• Em andamento: ${andamento}`
+    );
+
+    resumo.push(
+        `• Pendentes: ${pendentes}`
+    );
+
+    resumo.push(
+        `• Atrasadas: ${atrasadas}`
+    );
+
+    resumo.push(
+        `• Efetividade geral: ${efetividade}%`
+    );
+
+    let y = 128;
+
+    resumo.forEach(item=>{
+
+        doc.text(
+            item,
+            18,
+            y
+        );
+
+        y += 8;
+
+    });
+
+    // ==========================================
+    // OBSERVAÇÃO
+    // ==========================================
+
+    doc.setFillColor(245,245,245);
+
+    doc.roundedRect(
+        15,
+        178,
+        265,
+        20,
+        2,
+        2,
+        "F"
+    );
+
+    doc.setFontSize(10);
+
+    doc.setTextColor(90);
+
+    doc.text(
+        "Este relatório foi gerado automaticamente pelo sistema Housekeeping TOEX.",
+        20,
+        188
+    );
+
+    doc.text(
+        "Os indicadores representam a situação no momento da emissão.",
+        20,
+        194
+    );
+
+    // ==========================================
+    // NOVA PÁGINA
+    // ==========================================
+
+    doc.addPage();
+
+        // ==========================================
+    // TÍTULO DA TABELA
+    // ==========================================
+
+    doc.setFontSize(18);
+    doc.setTextColor(...azul);
+
+    doc.text(
+        "Lista de Atividades",
+        14,
+        18
+    );
+
+    doc.setFontSize(10);
+
+    doc.setTextColor(90);
+
+    doc.text(
+        "Relação completa das atividades registradas.",
+        14,
+        24
+    );
+
+    // ==========================================
+    // DADOS DA TABELA
+    // ==========================================
+
+    const linhas = lista.map(a => [
 
         a.id,
+
         a.area,
+
         a.atividade,
-        a.encarregado,
+
         a.colaborador,
+
         a.prioridade,
+
         a.status,
+
         formatarData(a.inicio),
+
         formatarData(a.prazo),
+
         a.progresso + "%"
 
     ]);
 
     doc.autoTable({
 
-        startY: 28,
+        startY:30,
 
-        head: [[
+        head:[[
             "ID",
             "Área",
             "Atividade",
-            "Encarregado",
             "Colaborador",
             "Prioridade",
             "Status",
@@ -1480,18 +1816,167 @@ function exportarPDF() {
             "%"
         ]],
 
-        body: linhas,
+        body:linhas,
 
-        headStyles: {
-            fillColor: [0, 59, 113]
+        styles:{
+            fontSize:8,
+            cellPadding:2,
+            valign:"middle"
         },
 
-        styles: {
-            fontSize: 8,
-            cellPadding: 2
+        headStyles:{
+            fillColor:azul,
+            textColor:255,
+            fontStyle:"bold"
+        },
+
+        alternateRowStyles:{
+            fillColor:[245,245,245]
+        },
+
+        margin:{
+            left:10,
+            right:10
         }
 
     });
+
+        // ==========================================
+    // NOVA PÁGINA PARA OS GRÁFICOS
+    // ==========================================
+
+    doc.addPage();
+
+    doc.setFontSize(18);
+
+    doc.setTextColor(...azul);
+
+    doc.text(
+        "Dashboard Gráfico",
+        14,
+        18
+    );
+
+        // ==========================================
+    // CAPTURA DOS GRÁFICOS
+    // ==========================================
+
+    const canvasStatus =
+        document.getElementById("graficoStatus");
+
+    const canvasArea =
+        document.getElementById("graficoArea");
+
+    const canvasColaborador =
+        document.getElementById("graficoColaborador");
+
+    const canvasEfetividade =
+        document.getElementById("graficoCriticidade");
+
+    const imgStatus = await html2canvas(
+        canvasStatus.parentElement,
+        {
+            backgroundColor:"#ffffff",
+            scale:2
+        }
+    );
+
+    const imgArea = await html2canvas(
+        canvasArea.parentElement,
+        {
+            backgroundColor:"#ffffff",
+            scale:2
+        }
+    );
+
+    const imgColaborador = await html2canvas(
+        canvasColaborador.parentElement,
+        {
+            backgroundColor:"#ffffff",
+            scale:2
+        }
+    );
+
+    const imgEfetividade = await html2canvas(
+        canvasEfetividade.parentElement,
+        {
+            backgroundColor:"#ffffff",
+            scale:2
+        }
+    );
+
+        doc.addImage(
+        imgStatus.toDataURL("image/png"),
+        "PNG",
+        10,
+        28,
+        130,
+        80
+    );
+
+    doc.addImage(
+        imgArea.toDataURL("image/png"),
+        "PNG",
+        150,
+        28,
+        130,
+        80
+    );
+
+    doc.addImage(
+        imgColaborador.toDataURL("image/png"),
+        "PNG",
+        10,
+        118,
+        130,
+        80
+    );
+
+    doc.addImage(
+        imgEfetividade.toDataURL("image/png"),
+        "PNG",
+        150,
+        118,
+        130,
+        80
+    );
+
+        // ==========================================
+    // RODAPÉ
+    // ==========================================
+
+    const paginas = doc.getNumberOfPages();
+
+    for(let i=1;i<=paginas;i++){
+
+        doc.setPage(i);
+
+        doc.setDrawColor(220);
+
+        doc.line(
+            10,
+            205,
+            287,
+            205
+        );
+
+        doc.setFontSize(9);
+
+        doc.setTextColor(120);
+
+        doc.text(
+            "Housekeeping Management System - Terminal TOEX",
+            10,
+            210
+        );
+
+        doc.text(
+            "Página " + i + " de " + paginas,
+            245,
+            210
+        );
+
+    }
 
     doc.save("Housekeeping_TOEX.pdf");
 
