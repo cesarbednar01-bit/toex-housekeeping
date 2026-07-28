@@ -102,34 +102,6 @@ function obterLista() {
 }
 
 
-function aplicarFiltros() {
-
-    let lista = [...state.atividades];
-
-    const dataInicio = document.getElementById("dataInicio")?.value;
-    const dataFim = document.getElementById("dataFim")?.value;
-
-    if (dataInicio && dataFim) {
-
-        lista = lista.filter((atividade) => {
-
-            const dataComparacao = atividade.inicio;
-
-            if (!dataComparacao) return false;
-
-            return (
-                dataComparacao >= dataInicio &&
-                dataComparacao <= dataFim
-            );
-
-        });
-
-    }
-
-    state.atividadesFiltradas = lista;
-
-}
-
 
 // ======================================
 // VERIFICA SE O USUÁRIO ESTÁ LOGADO
