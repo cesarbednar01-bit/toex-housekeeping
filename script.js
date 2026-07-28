@@ -55,24 +55,41 @@ const state = {
 
     mostrarHistorico: false,
 
+    // NOVOS CONTROLES
+    modoDashboard: "hoje",        // hoje | periodo
+    modoVisualizacao: "operacional", // operacional | historico | periodo
+
     elementos: {}
 
 };
+
 
 
 // <-- NOVA FUNÇÃO AQUI
 
 function obterLista() {
 
-    if (state.atividadesFiltradas.length > 0) {
-
+    // MODO CONSULTA (período filtrado)
+    if (state.modoDashboard === "periodo") {
         return state.atividadesFiltradas;
-
     }
 
-    return state.atividades;
+    // MODO OPERAÇÃO (somente hoje)
+    const hoje = new Date().toISOString().split("T")[0];
+
+    return state.atividades.filter(atividade => {
+
+        const dataComparacao =
+            atividade.status === "Concluído"
+                ? atividade.dataConclusao
+                : atividade.inicio;
+
+        return dataComparacao === hoje;
+
+    });
 
 }
+
 
 function aplicarFiltros() {
 
@@ -85,10 +102,7 @@ function aplicarFiltros() {
 
         lista = lista.filter((atividade) => {
 
-            const dataComparacao =
-                atividade.status === "Concluído"
-                    ? atividade.dataConclusao
-                    : atividade.inicio;
+            const dataComparacao = atividade.inicio;
 
             if (!dataComparacao) return false;
 
@@ -693,9 +707,20 @@ function renderizarTabela() {
         return;
     }
 
-    const lista = state.mostrarHistorico
+    let lista;
+
+if (state.modoDashboard === "periodo") {
+
+    // No modo consulta mostra TODAS as atividades do período
+    lista = atividades;
+
+} else {
+
+    lista = state.mostrarHistorico
         ? atividades.filter(a => a.status === "Concluído")
         : atividades.filter(a => a.status !== "Concluído");
+
+}
 
     lista.forEach((atividade) => {
 
@@ -1430,9 +1455,32 @@ function filtrarPeriodo() {
         return;
     }
 
+    // Ativa o modo consulta
+    state.modoDashboard = "periodo";
+    state.modoVisualizacao = "periodo";
+
     aplicarFiltros();
 
-    renderizarSistema();
+    // Abre automaticamente o histórico
+    if (!state.mostrarHistorico) {
+        alternarHistorico();
+    } else {
+        renderizarSistema();
+    }
+
+    // Aguarda a renderização e faz a rolagem
+    setTimeout(() => {
+
+        const tabela = document.getElementById("tituloTabela");
+
+        if (tabela) {
+            tabela.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
+        }
+
+    }, 300);
 
 }
 
@@ -1447,10 +1495,7 @@ function aplicarFiltros() {
 
         lista = lista.filter((atividade) => {
 
-            const dataComparacao =
-                atividade.status === "Concluído"
-                    ? atividade.dataConclusao
-                    : atividade.inicio;
+            const dataComparacao = atividade.inicio;
 
             if (!dataComparacao) return false;
 
@@ -1494,9 +1539,23 @@ async function exportarPDF() {
     const hora =
         hoje.toLocaleTimeString("pt-BR");
 
-    const lista = state.mostrarHistorico
-        ? state.atividades.filter(a => a.status === "Concluído")
-        : state.atividades.filter(a => a.status !== "Concluído");
+    let lista;
+
+    if (state.modoDashboard === "periodo") {
+
+        // No modo consulta mostra TODAS as atividades do período
+        lista = atividades;
+
+    } else {
+
+        // Operação normal
+        lista = state.mostrarHistorico
+            ? atividades.filter(a => a.status === "Concluído")
+            : atividades.filter(a => a.status !== "Concluído");
+
+    }
+
+    
 
     const total = lista.length;
 
