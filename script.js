@@ -1,30 +1,18 @@
-/*=========================================================
-    HOUSEKEEPING MANAGEMENT SYSTEM v4.0
-    TERMINAL TOEX
-
-    Desenvolvido em:
-    HTML5
-    CSS3
-    JavaScript ES6+
-
-=========================================================*/
 
 
-/*=========================================================
-    CONFIGURAÇÕES GLOBAIS
-=========================================================*/
 
-"use strict";
 
 import { db } from "./firebase.js";
 
 import {
-    collection,
-    addDoc,
-    getDocs,
-    updateDoc,
-    deleteDoc,
-    doc
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -504,10 +492,46 @@ function validarFormulario() {
 
 function carregarAtividades() {
 
-    state.atividades = [];
+    mostrarMensagem("Conectando ao Firestore...");
+
+    const atividadesRef = collection(db, "atividades");
+
+    const q = query(
+        atividadesRef,
+        orderBy("inicio", "desc")
+    );
+
+    onSnapshot(q, (snapshot) => {
+
+        state.atividades = [];
+
+        snapshot.forEach((docSnap) => {
+
+            state.atividades.push({
+
+                id: docSnap.id,
+
+                ...docSnap.data()
+
+            });
+
+        });
+
+        mostrarMensagem(
+            `${state.atividades.length} atividade(s) carregada(s).`
+        );
+
+        renderizarSistema();
+
+    }, (erro) => {
+
+        console.error(erro);
+
+        alert("Erro ao carregar atividades do Firestore.");
+
+    });
 
 }
-
 
 
 /*=========================================================
@@ -556,15 +580,13 @@ function alternarHistorico() {
     SALVAR NOVA ATIVIDADE
 =========================================================*/
 
-function salvarNovaAtividade() {
+async function salvarNovaAtividade() {
 
     if (!validarFormulario()) return;
 
     const el = state.elementos;
 
-
     const atividade = {
-        id: gerarID(),
 
         area: el.area.value,
         atividade: el.atividade.value.trim(),
@@ -581,9 +603,10 @@ function salvarNovaAtividade() {
         dataConclusao: null,
         horaConclusao: null,
         concluidoPor: null
+
     };
 
-    // Se a atividade foi concluída
+    // Caso a atividade já seja criada como concluída
     if (atividade.status === "Concluído") {
 
         const agora = new Date();
@@ -596,70 +619,57 @@ function salvarNovaAtividade() {
         });
 
         atividade.concluidoPor = "Rayan Cardoso";
+
     }
 
+    try {
 
-    if (state.atividadeEditando !== null) {
+        // ===========================
+        // EDITAR
+        // ===========================
+        if (state.atividadeEditando) {
 
-        atividade.id = state.atividadeEditando;
+            const atividadeRef = doc(
+                db,
+                "atividades",
+                state.atividadeEditando
+            );
 
-        const indice = state.atividades.findIndex(
-            item => item.id === state.atividadeEditando
-        );
+            await updateDoc(atividadeRef, atividade);
 
-        if (indice !== -1) {
-
-            const antiga = state.atividades[indice];
-
-            // Mantém as fotos existentes
-            atividade.fotos = antiga.fotos || [];
-
-            // Se já estava concluída anteriormente,
-            // mantém os dados da conclusão
-            if (antiga.dataConclusao) {
-
-                atividade.dataConclusao = antiga.dataConclusao;
-                atividade.horaConclusao = antiga.horaConclusao;
-                atividade.concluidoPor = antiga.concluidoPor;
-
-            }
-
-            // Se acabou de ser concluída agora,
-            // registra a conclusão
-            if (
-                atividade.status === "Concluído" &&
-                !atividade.dataConclusao
-            ) {
-
-                const agora = new Date();
-
-                atividade.dataConclusao =
-                    agora.toISOString().split("T")[0];
-
-                atividade.horaConclusao =
-                    agora.toLocaleTimeString("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit"
-                    });
-
-                atividade.concluidoPor = "Rayan Cardoso";
-
-            }
-
-            state.atividades[indice] = atividade;
+            mostrarMensagem("Atividade atualizada com sucesso.");
 
         }
 
-    } else {
+        // ===========================
+        // NOVA
+        // ===========================
+        else {
 
-        state.atividades.push(atividade);
+            await addDoc(
+                collection(db, "atividades"),
+                atividade
+            );
+
+            mostrarMensagem("Atividade cadastrada com sucesso.");
+
+        }
+
+        fecharModal();
+
+        limparFormulario();
+
+        state.atividadeEditando = null;
 
     }
 
+    catch (erro) {
 
-    fecharModal();
+        console.error(erro);
 
-    renderizarSistema();
+        alert("Erro ao salvar atividade no Firestore.");
+
+    }
 
 }
 
@@ -692,18 +702,17 @@ function renderizarTabela() {
 
     let lista;
 
-if (state.modoDashboard === "periodo") {
+    if (state.modoDashboard === "periodo") {
 
-    // No modo consulta mostra TODAS as atividades do período
-    lista = atividades;
+        lista = atividades;
 
-} else {
+    } else {
 
-    lista = state.mostrarHistorico
-        ? atividades.filter(a => a.status === "Concluído")
-        : atividades.filter(a => a.status !== "Concluído");
+        lista = state.mostrarHistorico
+            ? atividades.filter(a => a.status === "Concluído")
+            : atividades.filter(a => a.status !== "Concluído");
 
-}
+    }
 
     lista.forEach((atividade) => {
 
@@ -721,13 +730,9 @@ if (state.modoDashboard === "periodo") {
 
             <td>${atividade.colaborador}</td>
 
-            <td>
-                ${criarBadgePrioridade(atividade.prioridade)}
-            </td>
+            <td>${criarBadgePrioridade(atividade.prioridade)}</td>
 
-            <td>
-                ${criarBadgeStatus(atividade.status)}
-            </td>
+            <td>${criarBadgeStatus(atividade.status)}</td>
 
             <td>${formatarData(atividade.inicio)}</td>
 
@@ -736,30 +741,38 @@ if (state.modoDashboard === "periodo") {
             <td>${atividade.progresso}%</td>
 
             <td>
+
                 <div class="acoes-tabela">
 
                     <button
                         class="btn-acao duplicar"
-                        onclick="duplicarAtividade(${atividade.id})"
+                        onclick="duplicarAtividade('${atividade.id}')"
                         title="Duplicar">
+
                         <i class="fa-solid fa-copy"></i>
+
                     </button>
 
                     <button
                         class="btn-acao editar"
-                        onclick="editarAtividade(${atividade.id})"
+                        onclick="editarAtividade('${atividade.id}')"
                         title="Editar">
+
                         <i class="fa-solid fa-pen"></i>
+
                     </button>
 
                     <button
                         class="btn-acao excluir"
-                        onclick="excluirAtividade(${atividade.id})"
+                        onclick="excluirAtividade('${atividade.id}')"
                         title="Excluir">
+
                         <i class="fa-solid fa-trash"></i>
+
                     </button>
 
                 </div>
+
             </td>
 
         `;
@@ -812,36 +825,25 @@ function criarBadgeStatus(status) {
 function editarAtividade(id) {
 
     const atividade = state.atividades.find(
-
         item => item.id === id
-
     );
 
     if (!atividade) return;
 
-    state.atividadeEditando = id;
+    // Guarda o ID do documento do Firestore
+    state.atividadeEditando = atividade.id;
 
     const el = state.elementos;
 
     el.area.value = atividade.area;
-
     el.atividade.value = atividade.atividade;
-
     el.encarregado.value = atividade.encarregado;
-
     el.colaborador.value = atividade.colaborador;
-
     el.prioridade.value = atividade.prioridade;
-
     el.status.value = atividade.status;
-
     el.inicio.value = atividade.inicio;
-
     el.prazo.value = atividade.prazo;
-
     el.progresso.value = atividade.progresso;
-
-
 
     abrirModal(false);
 
@@ -916,31 +918,35 @@ function abrirModal(limpar = true) {
     EXCLUIR ATIVIDADE
 =========================================================*/
 
-function excluirAtividade(id) {
+async function excluirAtividade(id) {
 
     const atividade = state.atividades.find(
-
         item => item.id === id
-
     );
 
     if (!atividade) return;
 
     const confirmar = confirm(
-
         `Deseja realmente excluir a atividade:\n\n${atividade.atividade}?`
-
     );
 
     if (!confirmar) return;
 
-    state.atividades = state.atividades.filter(
+    try {
 
-        item => item.id !== id
+        await deleteDoc(
+            doc(db, "atividades", id)
+        );
 
-    );
+        mostrarMensagem("Atividade excluída com sucesso.");
 
-    renderizarSistema();
+    } catch (erro) {
+
+        console.error(erro);
+
+        alert("Erro ao excluir atividade.");
+
+    }
 
 }
 
@@ -2027,4 +2033,10 @@ function imprimirSistema() {
     window.print();
 
 }
+
+// Disponibiliza as funções para os botões da tabela
+window.editarAtividade = editarAtividade;
+window.excluirAtividade = excluirAtividade;
+window.duplicarAtividade = duplicarAtividade;
+window.logout = logout;
 
