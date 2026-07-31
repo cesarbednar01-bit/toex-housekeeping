@@ -1,19 +1,13 @@
 // ========================================
 // HOUSEKEEPING TOEX
-// LOGIN FIREBASE
+// LOGIN FIRESTORE
 // ========================================
 
-import { auth, db } from "./firebase.js";
+import { db } from "./firebase.js";
 
 import {
-    signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
-import {
-    collection,
-    query,
-    where,
-    getDocs
+    doc,
+    getDoc
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 // ========================================
@@ -26,7 +20,7 @@ const btnEntrar = document.getElementById("btnEntrar");
 const btnMostrarSenha = document.getElementById("mostrarSenha");
 
 // ========================================
-// MOSTRAR / OCULTAR SENHA
+// MOSTRAR SENHA
 // ========================================
 
 btnMostrarSenha.addEventListener("click", () => {
@@ -36,12 +30,16 @@ btnMostrarSenha.addEventListener("click", () => {
     if (inputSenha.type === "password") {
 
         inputSenha.type = "text";
-        icone.classList.replace("fa-eye", "fa-eye-slash");
+
+        icone.classList.remove("fa-eye");
+        icone.classList.add("fa-eye-slash");
 
     } else {
 
         inputSenha.type = "password";
-        icone.classList.replace("fa-eye-slash", "fa-eye");
+
+        icone.classList.remove("fa-eye-slash");
+        icone.classList.add("fa-eye");
 
     }
 
@@ -65,7 +63,6 @@ async function realizarLogin() {
 
     try {
 
-        // Procura o usuário no Firestore
         const q = query(
             collection(db, "usuarios"),
             where("usuario", "==", usuario)
@@ -80,65 +77,54 @@ async function realizarLogin() {
 
         }
 
-        const dadosUsuario = snapshot.docs[0].data();
+        const dados = snapshot.docs[0].data();
 
-        console.log("Usuário encontrado:", dadosUsuario);
+        // Verifica se está ativo
 
-        // Login no Firebase Authentication
-        const credencial = await signInWithEmailAndPassword(
-            auth,
-            dadosUsuario.email,
-            senha
-        );
+        if (!dados.ativo) {
 
-        console.log("Login realizado:", credencial.user);
+            alert("Usuário desativado.");
+            return;
+
+        }
+
+        // Verifica senha
+
+        if (dados.senha !== senha) {
+
+            alert("Senha incorreta.");
+
+            inputSenha.value = "";
+            inputSenha.focus();
+
+            return;
+
+        }
 
         // Salva sessão
+
         sessionStorage.setItem(
             "usuarioLogado",
             JSON.stringify({
-                uid: credencial.user.uid,
-                usuario: dadosUsuario.usuario,
-                nome: dadosUsuario.nome,
-                perfil: dadosUsuario.perfil,
-                email: dadosUsuario.email,
-                ativo: dadosUsuario.ativo
+
+                usuario: dados.usuario,
+                nome: dados.nome,
+                perfil: dados.perfil,
+                email: dados.email,
+                ativo: dados.ativo
+
             })
         );
 
-        window.location.replace("index.html");
+        window.location.href = "index.html";
 
-    } catch (erro) {
+    }
 
-        console.error("Erro Firebase:", erro);
+    catch (erro) {
 
-        switch (erro.code) {
+        console.error(erro);
 
-            case "auth/invalid-credential":
-                alert("Usuário ou senha inválidos.");
-                break;
-
-            case "auth/user-not-found":
-                alert("Usuário não encontrado no Authentication.");
-                break;
-
-            case "auth/wrong-password":
-                alert("Senha incorreta.");
-                break;
-
-            case "auth/too-many-requests":
-                alert("Muitas tentativas de login. Aguarde alguns minutos.");
-                break;
-
-            default:
-                alert(
-                    "Erro: " +
-                    (erro.code || "") +
-                    "\n\n" +
-                    (erro.message || erro)
-                );
-
-        }
+        alert("Erro ao conectar com o banco de dados.");
 
     }
 
@@ -176,6 +162,6 @@ inputSenha.addEventListener("keydown", (e) => {
 
 if (sessionStorage.getItem("usuarioLogado")) {
 
-    window.location.replace("index.html");
+    window.location.href = "index.html";
 
 }
