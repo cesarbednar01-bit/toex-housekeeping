@@ -1,32 +1,20 @@
 // ========================================
-// HOUSEKEEPING MANAGEMENT SYSTEM
-// LOGIN
+// HOUSEKEEPING TOEX
+// LOGIN FIREBASE
 // ========================================
 
-// ========================================
-// USUÁRIOS DO SISTEMA (TEMPORÁRIO)
-// Futuramente estes dados virão do Firebase.
-// ========================================
+import { auth, db } from "./firebase.js";
 
-const USUARIOS = [
+import {
+    signInWithEmailAndPassword
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
-    {
-        id: 1,
-        usuario: "Cesar.Bednarczuk",
-        senha: "Moxaki123",
-        nome: "Cesar Bednarczuk",
-        perfil: "Administrador"
-    },
-
-    {
-        id: 2,
-        usuario: "Rayan.Cardoso",
-        senha: "Choraboy123",
-        nome: "Rayan Cardoso",
-        perfil: "Operador"
-    }
-
-];
+import {
+    collection,
+    query,
+    where,
+    getDocs
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 // ========================================
 // ELEMENTOS
@@ -48,16 +36,12 @@ btnMostrarSenha.addEventListener("click", () => {
     if (inputSenha.type === "password") {
 
         inputSenha.type = "text";
-
-        icone.classList.remove("fa-eye");
-        icone.classList.add("fa-eye-slash");
+        icone.classList.replace("fa-eye", "fa-eye-slash");
 
     } else {
 
         inputSenha.type = "password";
-
-        icone.classList.remove("fa-eye-slash");
-        icone.classList.add("fa-eye");
+        icone.classList.replace("fa-eye-slash", "fa-eye");
 
     }
 
@@ -67,39 +51,94 @@ btnMostrarSenha.addEventListener("click", () => {
 // LOGIN
 // ========================================
 
-function realizarLogin() {
+async function realizarLogin() {
 
     const usuario = inputUsuario.value.trim();
-    const senha = inputSenha.value.trim();
+    const senha = inputSenha.value;
 
-    if (usuario === "" || senha === "") {
+    if (!usuario || !senha) {
 
-        alert("Preencha usuário e senha.");
+        alert("Informe usuário e senha.");
         return;
 
     }
 
-    const usuarioEncontrado = USUARIOS.find(u =>
-        u.usuario.toLowerCase() === usuario.toLowerCase() &&
-        u.senha === senha
-    );
+    try {
 
-    if (usuarioEncontrado) {
-
-        // Salva todas as informações do usuário
-        sessionStorage.setItem(
-            "usuarioLogado",
-            JSON.stringify(usuarioEncontrado)
+        // Procura o usuário no Firestore
+        const q = query(
+            collection(db, "usuarios"),
+            where("usuario", "==", usuario)
         );
 
-        window.location.href = "index.html";
+        const snapshot = await getDocs(q);
 
-    } else {
+        if (snapshot.empty) {
 
-        alert("Usuário ou senha inválidos.");
+            alert("Usuário não encontrado.");
+            return;
 
-        inputSenha.value = "";
-        inputSenha.focus();
+        }
+
+        const dadosUsuario = snapshot.docs[0].data();
+
+        console.log("Usuário encontrado:", dadosUsuario);
+
+        // Login no Firebase Authentication
+        const credencial = await signInWithEmailAndPassword(
+            auth,
+            dadosUsuario.email,
+            senha
+        );
+
+        console.log("Login realizado:", credencial.user);
+
+        // Salva sessão
+        sessionStorage.setItem(
+            "usuarioLogado",
+            JSON.stringify({
+                uid: credencial.user.uid,
+                usuario: dadosUsuario.usuario,
+                nome: dadosUsuario.nome,
+                perfil: dadosUsuario.perfil,
+                email: dadosUsuario.email,
+                ativo: dadosUsuario.ativo
+            })
+        );
+
+        window.location.replace("index.html");
+
+    } catch (erro) {
+
+        console.error("Erro Firebase:", erro);
+
+        switch (erro.code) {
+
+            case "auth/invalid-credential":
+                alert("Usuário ou senha inválidos.");
+                break;
+
+            case "auth/user-not-found":
+                alert("Usuário não encontrado no Authentication.");
+                break;
+
+            case "auth/wrong-password":
+                alert("Senha incorreta.");
+                break;
+
+            case "auth/too-many-requests":
+                alert("Muitas tentativas de login. Aguarde alguns minutos.");
+                break;
+
+            default:
+                alert(
+                    "Erro: " +
+                    (erro.code || "") +
+                    "\n\n" +
+                    (erro.message || erro)
+                );
+
+        }
 
     }
 
@@ -111,7 +150,7 @@ function realizarLogin() {
 
 btnEntrar.addEventListener("click", realizarLogin);
 
-inputUsuario.addEventListener("keypress", function (e) {
+inputUsuario.addEventListener("keydown", (e) => {
 
     if (e.key === "Enter") {
 
@@ -121,7 +160,7 @@ inputUsuario.addEventListener("keypress", function (e) {
 
 });
 
-inputSenha.addEventListener("keypress", function (e) {
+inputSenha.addEventListener("keydown", (e) => {
 
     if (e.key === "Enter") {
 
@@ -132,11 +171,11 @@ inputSenha.addEventListener("keypress", function (e) {
 });
 
 // ========================================
-// SE JÁ ESTIVER LOGADO
+// JÁ LOGADO
 // ========================================
 
 if (sessionStorage.getItem("usuarioLogado")) {
 
-    window.location.href = "index.html";
+    window.location.replace("index.html");
 
 }
