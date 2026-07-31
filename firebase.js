@@ -8,6 +8,10 @@ import {
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
+import {
+    getAuth
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
 const firebaseConfig = {
     apiKey: "AIzaSyBP_fgYUSZVGP7gIhs1YvQZtcoAFM3dv40",
     authDomain: "housekeeping-toex.firebaseapp.com",
@@ -21,4 +25,6 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-export { app, db };
+const auth = getAuth(app);
+
+export { app, db, auth };

@@ -1,20 +1,15 @@
-
-
-
-
 import { db } from "./firebase.js";
 
 import {
-  collection,
-  addDoc,
-  updateDoc,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  query,
-  orderBy
+    collection,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    query,
+    orderBy
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
 
 const CONFIG = {
 
@@ -28,8 +23,6 @@ const CONFIG = {
 
 };
 
-
-
 /*=========================================================
     ESTADO GLOBAL DA APLICAÇÃO
 =========================================================*/
@@ -38,11 +31,15 @@ const state = {
 
     atividades: [],
 
-    atividadesFiltradas: [],
-
     atividadeSelecionada: null,
 
     atividadeEditando: null,
+
+    dataSelecionada: obterDataLocal(),
+
+    dataInicio: obterDataLocal(),
+
+    dataFim: obterDataLocal(),
 
     fotosTemporarias: [],
 
@@ -52,44 +49,109 @@ const state = {
 
     carregando: false,
 
-    mostrarHistorico: false,
-
-    // NOVOS CONTROLES
-    modoDashboard: "hoje",        // hoje | periodo
-    modoVisualizacao: "operacional", // operacional | historico | periodo
-
     elementos: {}
 
 };
 
+/*=========================================================
+    DATA LOCAL (evita problemas de fuso horário)
+=========================================================*/
 
+function obterDataLocal() {
 
-// <-- NOVA FUNÇÃO AQUI
+    const data = new Date();
+
+    const ano = data.getFullYear();
+    const mes = String(data.getMonth() + 1).padStart(2, "0");
+    const dia = String(data.getDate()).padStart(2, "0");
+
+    return `${ano}-${mes}-${dia}`;
+
+}
+
+/*=========================================================
+    NORMALIZAÇÃO DE DATAS
+    Aceita: yyyy-mm-dd | dd/mm/yyyy | dd-mm-yyyy | Timestamp Firestore | Date
+=========================================================*/
+
+function normalizarData(valor) {
+
+    if (!valor) return "";
+
+    // Timestamp do Firestore
+    if (valor && typeof valor.toDate === "function") {
+        valor = valor.toDate();
+    }
+
+    // Objeto Date
+    if (valor instanceof Date) {
+        const ano = valor.getFullYear();
+        const mes = String(valor.getMonth() + 1).padStart(2, "0");
+        const dia = String(valor.getDate()).padStart(2, "0");
+        return `${ano}-${mes}-${dia}`;
+    }
+
+    const texto = String(valor).trim();
+
+    // dd/mm/yyyy ou dd-mm-yyyy
+    const formatoBrasileiro = texto.match(/^(\d{2})[\/-](\d{2})[\/-](\d{4})$/);
+
+    if (formatoBrasileiro) {
+        const [, dia, mes, ano] = formatoBrasileiro;
+        return `${ano}-${mes}-${dia}`;
+    }
+
+    // yyyy-mm-dd ou yyyy-mm-ddTHH:mm:ss
+    if (/^\d{4}-\d{2}-\d{2}/.test(texto)) {
+        return texto.substring(0, 10);
+    }
+
+    return texto;
+
+}
+
+/*=========================================================
+    FILTRO DE ATIVIDADES POR PERÍODO
+=========================================================*/
 
 function obterLista() {
 
-    // MODO CONSULTA (período filtrado)
-    if (state.modoDashboard === "periodo") {
-        return state.atividadesFiltradas;
-    }
+    const dataInicio = normalizarData(
+        state.dataInicio || state.dataSelecionada
+    );
 
-    // MODO OPERAÇÃO (somente hoje)
-    const hoje = new Date().toISOString().split("T")[0];
+    const dataFim = normalizarData(
+        state.dataFim || state.dataSelecionada
+    );
 
-    return state.atividades.filter(atividade => {
+    return state.atividades.filter((atividade) => {
 
-        const dataComparacao =
-            atividade.status === "Concluído"
-                ? atividade.dataConclusao
-                : atividade.inicio;
+        const dataAtividade = normalizarData(atividade.inicio);
 
-        return dataComparacao === hoje;
+        if (!dataAtividade) return false;
+
+        console.log("Filtro:", dataInicio, "até", dataFim);
+
+        state.atividades.forEach(a => {
+            console.log(
+                "Atividade:",
+                a.atividade,
+                "| início:",
+                a.inicio,
+                "| normalizada:",
+                normalizarData(a.inicio)
+            );
+        });
+
+
+        return (
+            dataAtividade >= dataInicio &&
+            dataAtividade <= dataFim
+        );
 
     });
 
 }
-
-
 
 // ======================================
 // VERIFICA SE O USUÁRIO ESTÁ LOGADO
@@ -103,7 +165,6 @@ if (!usuarioLogado) {
 
 }
 
-
 /*=========================================================
     CACHE DOS ELEMENTOS HTML
 =========================================================*/
@@ -116,7 +177,6 @@ function cacheDOM() {
 
         dataHora: document.getElementById("dataHora"),
 
-
         // BOTÕES
 
         btnNova: document.querySelector(".btn-nova"),
@@ -125,10 +185,13 @@ function cacheDOM() {
 
         btnImprimir: document.querySelector(".btn-imprimir"),
 
-        btnHistorico: document.getElementById("btnHistorico"),
+
 
         btnAplicar: document.getElementById("btnAplicar"),
 
+        dataInicio: document.getElementById("dataInicio"),
+
+        dataFim: document.getElementById("dataFim"),
 
         // MODAL
 
@@ -140,9 +203,7 @@ function cacheDOM() {
 
         salvarAtividade: document.getElementById("salvarAtividade"),
 
-
         // CAMPOS
-
 
         area: document.getElementById("area"),
 
@@ -164,13 +225,9 @@ function cacheDOM() {
 
         foto: document.getElementById("foto"),
 
-
-
-
         // TABELA
 
         tabela: document.getElementById("tabelaAtividades"),
-
 
         // GRÁFICOS
 
@@ -209,8 +266,6 @@ function carregarUsuarioLogado() {
 
 }
 
-
-
 /*=========================================================
     UTILITÁRIOS
 =========================================================*/
@@ -221,24 +276,23 @@ function gerarID() {
 
 }
 
-
 function formatarNumero(numero) {
 
     return Number(numero).toLocaleString("pt-BR");
 
 }
 
-
 function formatarData(data) {
 
-    if (!data) return "";
+    const valor = normalizarData(data);
 
-    const [ano, mes, dia] = data.split("-");
+    if (!valor) return "";
+
+    const [ano, mes, dia] = valor.split("-");
 
     return `${dia}/${mes}/${ano}`;
 
 }
-
 
 function formatarHora() {
 
@@ -251,9 +305,6 @@ function formatarHora() {
     });
 
 }
-
-
-
 
 /*=========================================================
     MENSAGENS
@@ -281,6 +332,10 @@ function iniciarSistema() {
 
     cacheDOM();
 
+    state.elementos.dataInicio.value = state.dataInicio;
+
+    state.elementos.dataFim.value = state.dataFim;
+
     configurarEventos();
 
     carregarUsuarioLogado();
@@ -293,15 +348,12 @@ function iniciarSistema() {
 
     carregarAtividades();
 
-    //inicializarDashboard();
-
     renderizarSistema();
 
     mostrarMensagem("Sistema iniciado com sucesso.");
 
+
 }
-
-
 
 /*=========================================================
     EVENTOS
@@ -321,8 +373,6 @@ function configurarEventos() {
 
     );
 
-
-
     // FECHAR MODAL
 
     el.fecharModal?.addEventListener(
@@ -341,7 +391,6 @@ function configurarEventos() {
 
     );
 
-
     // SALVAR
 
     el.salvarAtividade?.addEventListener(
@@ -351,7 +400,6 @@ function configurarEventos() {
         salvarNovaAtividade
 
     );
-
 
     // EXPORTAR PDF
 
@@ -363,7 +411,6 @@ function configurarEventos() {
 
     );
 
-
     // IMPRIMIR
 
     el.btnImprimir?.addEventListener(
@@ -374,28 +421,21 @@ function configurarEventos() {
 
     );
 
-    el.btnHistorico?.addEventListener(
-        "click",
-        alternarHistorico
-    );
+    // APLICAR PERÍODO
 
     el.btnAplicar?.addEventListener(
+
         "click",
+
         filtrarPeriodo
+
     );
 
+    // HISTÓRICO
 
 
 
 }
-
-
-
-
-
-
-
-
 
 function fecharModal() {
 
@@ -403,13 +443,9 @@ function fecharModal() {
 
 }
 
-
-
 function limparFormulario() {
 
     const el = state.elementos;
-
-
 
     el.area.value = "";
 
@@ -424,7 +460,7 @@ function limparFormulario() {
 
     el.status.value = "Pendente";
 
-    el.inicio.value = "";
+    el.inicio.value = obterDataLocal();
 
     el.prazo.value = "";
 
@@ -432,11 +468,7 @@ function limparFormulario() {
 
     el.foto.value = "";
 
-
-
 }
-
-
 
 /*=========================================================
     VALIDAÇÃO
@@ -445,8 +477,6 @@ function limparFormulario() {
 function validarFormulario() {
 
     const el = state.elementos;
-
-
 
     if (el.area.value === "") {
 
@@ -483,8 +513,6 @@ function validarFormulario() {
     return true;
 
 }
-
-
 
 /*=========================================================
     CARREGAMENTO DOS DADOS
@@ -533,7 +561,6 @@ function carregarAtividades() {
 
 }
 
-
 /*=========================================================
     RENDERIZAÇÃO PRINCIPAL
 =========================================================*/
@@ -548,33 +575,7 @@ function renderizarSistema() {
 
 }
 
-function alternarHistorico() {
 
-    state.mostrarHistorico = !state.mostrarHistorico;
-
-    const titulo = document.getElementById("tituloTabela");
-    const botao = document.getElementById("btnHistorico");
-
-    if (state.mostrarHistorico) {
-
-        titulo.textContent = "Histórico de Atividades";
-
-        botao.innerHTML =
-            '<i class="fa-solid fa-arrow-left"></i> Voltar';
-
-    } else {
-
-        titulo.textContent =
-            "Lista Operacional de Atividades";
-
-        botao.innerHTML =
-            '<i class="fa-solid fa-clock-rotate-left"></i> Histórico';
-
-    }
-
-    renderizarTabela();
-
-}
 
 /*=========================================================
     SALVAR NOVA ATIVIDADE
@@ -611,7 +612,7 @@ async function salvarNovaAtividade() {
 
         const agora = new Date();
 
-        atividade.dataConclusao = agora.toISOString().split("T")[0];
+        atividade.dataConclusao = obterDataLocal();
 
         atividade.horaConclusao = agora.toLocaleTimeString("pt-BR", {
             hour: "2-digit",
@@ -674,147 +675,141 @@ async function salvarNovaAtividade() {
 }
 
 /*=========================================================
+    STATUS -> CLASSE CSS
+=========================================================*/
+
+function obterClasseStatus(status) {
+
+    const valor = String(status || "").toLowerCase();
+
+    if (valor === "concluído" || valor === "concluido") {
+
+        return "concluido";
+
+    }
+
+    if (valor === "em andamento") {
+
+        return "andamento";
+
+    }
+
+    if (valor === "atrasado") {
+
+        return "atrasado";
+
+    }
+
+    return "pendente";
+
+}
+
+/*=========================================================
     RENDERIZAR TABELA
 =========================================================*/
 
 function renderizarTabela() {
 
-    const tbody = state.elementos.tabela;
+    let tabela = state.elementos.tabela;
 
-    if (!tbody) return;
+    if (!tabela) return;
 
-    tbody.innerHTML = "";
+    // Caso o ID esteja no <table> em vez do <tbody>
+    if (tabela.tagName === "TABLE") {
+
+        tabela = tabela.querySelector("tbody");
+
+    }
+
+    if (!tabela) return;
 
     const atividades = obterLista();
 
     if (atividades.length === 0) {
 
-        tbody.innerHTML = `
+        tabela.innerHTML = `
             <tr>
                 <td colspan="11" class="sem-registros">
-                    Nenhuma atividade encontrada.
+                    Nenhuma atividade encontrada para o período selecionado.
                 </td>
             </tr>
         `;
 
         return;
-    }
-
-    let lista;
-
-    if (state.modoDashboard === "periodo") {
-
-        lista = atividades;
-
-    } else {
-
-        lista = state.mostrarHistorico
-            ? atividades.filter(a => a.status === "Concluído")
-            : atividades.filter(a => a.status !== "Concluído");
 
     }
 
-    lista.forEach((atividade) => {
+    tabela.innerHTML = atividades.map((atividade, index) => {
 
-        const tr = document.createElement("tr");
+        const statusClasse = obterClasseStatus(atividade.status);
 
-        tr.innerHTML = `
+        const prioridadeClasse = String(
+            atividade.prioridade || ""
+        ).toLowerCase();
 
-            <td>${atividade.id}</td>
+        const progresso = Number(atividade.progresso || 0);
 
-            <td>${atividade.area}</td>
+        return `
+            <tr ondblclick="selecionarAtividade('${atividade.id}')">
+                <td>${String(index + 1).padStart(3, "0")}</td>
+                <td>${atividade.area || ""}</td>
+                <td>${atividade.atividade || ""}</td>
+                <td>${atividade.encarregado || ""}</td>
+                <td>${atividade.colaborador || ""}</td>
 
-            <td>${atividade.atividade}</td>
+                <td>
+                    <span class="prioridade ${prioridadeClasse}">
+                        ${atividade.prioridade || ""}
+                    </span>
+                </td>
 
-            <td>${atividade.encarregado}</td>
+                <td>
+                    <span class="status ${statusClasse}">
+                        ${atividade.status || ""}
+                    </span>
+                </td>
 
-            <td>${atividade.colaborador}</td>
+                <td>${formatarData(atividade.inicio)}</td>
+                <td>${formatarData(atividade.prazo)}</td>
 
-            <td>${criarBadgePrioridade(atividade.prioridade)}</td>
+                <td>
+                    <div class="mini-barra">
+                        <div
+                            class="mini-progresso"
+                            style="width: ${progresso}%">
+                        </div>
+                    </div>
+                    ${progresso}%
+                </td>
 
-            <td>${criarBadgeStatus(atividade.status)}</td>
+                <td>
+                    <div class="acoes-tabela">
+                        <button
+                            class="btn-acao editar"
+                            title="Editar"
+                            onclick="editarAtividade('${atividade.id}')">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
 
-            <td>${formatarData(atividade.inicio)}</td>
+                        <button
+                            class="btn-acao duplicar"
+                            title="Duplicar"
+                            onclick="duplicarAtividade('${atividade.id}')">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
 
-            <td>${formatarData(atividade.prazo)}</td>
-
-            <td>${atividade.progresso}%</td>
-
-            <td>
-
-                <div class="acoes-tabela">
-
-                    <button
-                        class="btn-acao duplicar"
-                        onclick="duplicarAtividade('${atividade.id}')"
-                        title="Duplicar">
-
-                        <i class="fa-solid fa-copy"></i>
-
-                    </button>
-
-                    <button
-                        class="btn-acao editar"
-                        onclick="editarAtividade('${atividade.id}')"
-                        title="Editar">
-
-                        <i class="fa-solid fa-pen"></i>
-
-                    </button>
-
-                    <button
-                        class="btn-acao excluir"
-                        onclick="excluirAtividade('${atividade.id}')"
-                        title="Excluir">
-
-                        <i class="fa-solid fa-trash"></i>
-
-                    </button>
-
-                </div>
-
-            </td>
-
+                        <button
+                            class="btn-acao excluir"
+                            title="Excluir"
+                            onclick="excluirAtividade('${atividade.id}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
         `;
 
-        tbody.appendChild(tr);
-
-    });
-
-}
-
-
-/*=========================================================
-    BADGE PRIORIDADE
-=========================================================*/
-
-function criarBadgePrioridade(prioridade) {
-
-    return `
-        <span class="badge prioridade ${prioridade.toLowerCase()}">
-            ${prioridade}
-        </span>
-    `;
-
-}
-
-
-
-/*=========================================================
-    BADGE STATUS
-=========================================================*/
-
-function criarBadgeStatus(status) {
-
-    const classe = status
-        .toLowerCase()
-        .replace(/\s/g, "-");
-
-    return `
-        <span class="badge status ${classe}">
-            ${status}
-        </span>
-    `;
+    }).join("");
 
 }
 
@@ -841,8 +836,8 @@ function editarAtividade(id) {
     el.colaborador.value = atividade.colaborador;
     el.prioridade.value = atividade.prioridade;
     el.status.value = atividade.status;
-    el.inicio.value = atividade.inicio;
-    el.prazo.value = atividade.prazo;
+    el.inicio.value = normalizarData(atividade.inicio);
+    el.prazo.value = normalizarData(atividade.prazo);
     el.progresso.value = atividade.progresso;
 
     abrirModal(false);
@@ -877,10 +872,10 @@ function duplicarAtividade(id) {
     el.prioridade.value = atividade.prioridade;
 
     // Copia também os demais dados da atividade
-    el.status.value = atividade.status;
-    el.inicio.value = atividade.inicio;
-    el.prazo.value = atividade.prazo;
-    el.progresso.value = atividade.progresso;
+    el.status.value = "Pendente";
+    el.inicio.value = obterDataLocal();
+    el.prazo.value = "";
+    el.progresso.value = 0;
 
     // Não duplica fotos
     el.foto.value = "";
@@ -911,8 +906,6 @@ function abrirModal(limpar = true) {
     state.elementos.modal.classList.add("active");
 
 }
-
-
 
 /*=========================================================
     EXCLUIR ATIVIDADE
@@ -949,8 +942,6 @@ async function excluirAtividade(id) {
     }
 
 }
-
-
 
 /*=========================================================
     DUPLO CLIQUE NA LINHA
@@ -1207,7 +1198,6 @@ function criarGraficoColaborador() {
 
 }
 
-
 /*=========================================================
     ÁREA
 =========================================================*/
@@ -1383,8 +1373,6 @@ function criarGraficoCriticidade() {
 
 }
 
-
-
 // ================================
 // DATA E HORA EM TEMPO REAL
 // ================================
@@ -1407,7 +1395,6 @@ function atualizarDataHora() {
         elemento.innerHTML = `${data}<br>${hora}`;
     }
 }
-
 
 /*=========================================================
     LOGOUT
@@ -1435,72 +1422,32 @@ function filtrarPeriodo() {
     const dataFim = document.getElementById("dataFim").value;
 
     if (!dataInicio || !dataFim) {
+
         alert("Selecione a data inicial e a data final.");
+
         return;
+
     }
 
     if (dataInicio > dataFim) {
+
         alert("A data inicial não pode ser maior que a data final.");
+
         return;
+
     }
 
-    // Ativa o modo consulta
-    state.modoDashboard = "periodo";
-    state.modoVisualizacao = "periodo";
+    state.dataInicio = normalizarData(dataInicio);
+    state.dataFim = normalizarData(dataFim);
+    state.dataSelecionada = state.dataInicio;
 
-    aplicarFiltros();
+    renderizarSistema();
 
-    // Abre automaticamente o histórico
-    if (!state.mostrarHistorico) {
-        alternarHistorico();
-    } else {
-        renderizarSistema();
-    }
-
-    // Aguarda a renderização e faz a rolagem
-    setTimeout(() => {
-
-        const tabela = document.getElementById("tituloTabela");
-
-        if (tabela) {
-            tabela.scrollIntoView({
-                behavior: "smooth",
-                block: "start"
-            });
-        }
-
-    }, 300);
+    mostrarMensagem(
+        `Dashboard carregado de ${formatarData(state.dataInicio)} até ${formatarData(state.dataFim)}`
+    );
 
 }
-
-function aplicarFiltros() {
-
-    const dataInicio = document.getElementById("dataInicio").value;
-    const dataFim = document.getElementById("dataFim").value;
-
-    let lista = [...state.atividades];
-
-    if (dataInicio && dataFim) {
-
-        lista = lista.filter((atividade) => {
-
-            const dataComparacao = atividade.inicio;
-
-            if (!dataComparacao) return false;
-
-            return (
-                dataComparacao >= dataInicio &&
-                dataComparacao <= dataFim
-            );
-
-        });
-
-    }
-
-    state.atividadesFiltradas = lista;
-
-}
-
 
 /*=========================================================
     EXPORTAR PDF
@@ -1528,23 +1475,7 @@ async function exportarPDF() {
     const hora =
         hoje.toLocaleTimeString("pt-BR");
 
-    let lista;
-
-    if (state.modoDashboard === "periodo") {
-
-        // No modo consulta mostra TODAS as atividades do período
-        lista = atividades;
-
-    } else {
-
-        // Operação normal
-        lista = state.mostrarHistorico
-            ? atividades.filter(a => a.status === "Concluído")
-            : atividades.filter(a => a.status !== "Concluído");
-
-    }
-
-    
+    const lista = obterLista();
 
     const total = lista.length;
 
@@ -1613,9 +1544,7 @@ async function exportarPDF() {
     );
 
     doc.text(
-        state.mostrarHistorico
-            ? "Modo: Histórico"
-            : "Modo: Operacional",
+        `Período: ${formatarData(state.dataInicio)} até ${formatarData(state.dataFim)}`,
         14,
         59
     );
@@ -2038,5 +1967,5 @@ function imprimirSistema() {
 window.editarAtividade = editarAtividade;
 window.excluirAtividade = excluirAtividade;
 window.duplicarAtividade = duplicarAtividade;
+window.selecionarAtividade = selecionarAtividade;
 window.logout = logout;
-
