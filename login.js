@@ -63,21 +63,18 @@ async function realizarLogin() {
 
     try {
 
-        const q = query(
-            collection(db, "usuarios"),
-            where("usuario", "==", usuario)
-        );
+        const usuarioRef = doc(db, "usuarios", usuario);
 
-        const snapshot = await getDocs(q);
+        const snapshot = await getDoc(usuarioRef);
 
-        if (snapshot.empty) {
+        if (!snapshot.exists()) {
 
             alert("Usuário não encontrado.");
             return;
 
         }
 
-        const dados = snapshot.docs[0].data();
+        const dados = snapshot.data();
 
         // Verifica se está ativo
 
@@ -109,8 +106,7 @@ async function realizarLogin() {
 
                 usuario: dados.usuario,
                 nome: dados.nome,
-                perfil: dados.perfil,
-                email: dados.email,
+                perfil: dados.perfil,    
                 ativo: dados.ativo
 
             })
